@@ -9,13 +9,10 @@ function App() {
     return (
         <div>
             <h1>License Plate Chat App</h1>
-            <div className="d-flex">
-                <ChatList />
-                <Routes>
-                    {/* <Route path="/" element={<Home />} /> */}
-                    <Route path="/chat/:id" element={<Chat />} />
-                </Routes>
-            </div>
+            <Routes>
+                <Route path="/" element={<ChatList />} />
+                <Route path="/chat/:id" element={<Chat />} />
+            </Routes>
         </div>
     );
 }

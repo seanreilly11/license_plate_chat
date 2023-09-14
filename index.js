@@ -1,5 +1,4 @@
 const express = require("express");
-const app = express();
 const http = require("http");
 const cors = require("cors");
 const { Server } = require("socket.io");
@@ -10,8 +9,13 @@ const {
     userLeave,
     getRoomUsers,
 } = require("./utils/users");
+const connectDB = require("./config/db");
+const app = express();
+
+connectDB();
 
 app.use(cors());
+app.use(express.json());
 
 const server = http.createServer(app);
 
@@ -23,6 +27,19 @@ const io = new Server(server, {
 });
 
 const botName = "Chat Bot";
+
+const videos = require("./routes/videos");
+const users = require("./routes/users");
+const courses = require("./routes/courses");
+
+app.use((req, res, next) => {
+    console.log(`${req.method} request for ${req.url}`);
+    next();
+});
+
+app.use("/api/v1/videos", videos);
+app.use("/api/v1/users", users);
+app.use("/api/v1/courses", courses);
 
 // io.use((socket, next) => {
 //     const username = socket.handshake.auth.username;
@@ -97,4 +114,4 @@ io.on("connection", (socket) => {
     });
 });
 
-server.listen(4000, () => "Server is running on port 3000");
+server.listen(4000, () => "Server is running on port 4000");

@@ -1,12 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ChatListItem from "./ChatListItem";
 
 function ChatList() {
+    const [users, setUsers] = useState([]);
+
+    const fetchUserData = () => {
+        fetch("http://localhost:4000/api/v1/users")
+            .then((response) => response.json())
+            .then((data) => setUsers(data));
+    };
+
+    useEffect(() => {
+        fetchUserData();
+    }, []);
+
     return (
         <div>
-            {[1, 2, 3].map((item) => (
-                <ChatListItem item={item} key={item} />
-            ))}
+            {users.length > 0 ? (
+                users?.map((user) => (
+                    <ChatListItem user={user} key={user._id} />
+                ))
+            ) : (
+                <div className="loader"></div>
+            )}
         </div>
     );
 }

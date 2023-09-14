@@ -1,10 +1,10 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 
-function ChatListItem({ item }) {
+function ChatListItem({ user }) {
     return (
-        <NavLink to={"/chat/" + item} className={"chat-list-item"}>
-            User {item}
+        <NavLink to={"/chat/" + user._id} className={"chat-list-item"}>
+            {user.firstname + " " + user.lastname}
         </NavLink>
     );
 }
