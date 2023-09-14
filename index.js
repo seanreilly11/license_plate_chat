@@ -54,20 +54,19 @@ app.use("/api/v1/courses", courses);
 // Run when client connects
 io.on("connection", (socket) => {
     // console.log(io.of("/").adapter);
+    console.log("Connected: " + socket.id);
     socket.on("joinRoom", ({ username, room }) => {
         const user = userJoin(socket.id, username, room);
         socket.join(user.room);
 
-        // Welcome current user
-        socket
-            .to(user.room)
-            .emit(
-                "message",
-                formatMessage(botName, "Welcome to ChatCord!", user.room)
-            );
+        // Welcome current user only
+        io.to(socket.id).emit(
+            "message",
+            formatMessage(botName, "Welcome to ChatCord!", user.room)
+        );
 
-        // Broadcast when a user connects
-        socket.broadcast
+        // Broadcast when a user connects to everyone except latest user
+        socket
             .to(user.room)
             .emit(
                 "message",
@@ -79,10 +78,10 @@ io.on("connection", (socket) => {
             );
 
         // Send users and room info
-        io.to(user.room).emit("roomUsers", {
-            room: user.room,
-            users: getRoomUsers(user.room),
-        });
+        // io.to(user.room).emit("roomUsers", {
+        //     room: user.room,
+        //     users: getRoomUsers(user.room),
+        // });
     });
 
     // Listen for chatMessage
