@@ -2,6 +2,7 @@ const bcryptjs = require("bcryptjs");
 // const nodemailer = require("nodemailer");
 // const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const Car = require("../models/Car");
 const Video = require("../models/Video");
 const Course = require("../models/Course");
 const { JWT_TOKEN } = require("../config/keys");
@@ -11,10 +12,20 @@ const { JWT_TOKEN } = require("../config/keys");
 // @route GET /api/v1/users
 exports.getUsers = async (req, res) => {
     try {
-        const users = await User.find().sort({ lastLogin: -1 });
-        return res.status(200).json(users);
+        // const users = await User.find().sort({ lastLogin: -1 });
+        const agg = await User.aggregate([
+            {
+                $lookup: {
+                    from: "cars",
+                    localField: "car",
+                    foreignField: "_id",
+                    as: "carDetails",
+                },
+            },
+        ]).sort({ lastLogin: -1 });
+        return res.status(200).json(agg);
     } catch (err) {
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: err.message });
     }
 };
 
@@ -249,32 +260,57 @@ function defineEmailHTML(data) {
 exports.registerUser = async (req, res, next) => {
     try {
         const { firstname, lastname, email, password } = req.body;
+        let { plate } = req.body;
+        plate = plate.toUpperCase();
         // this.sendEmail({ firstname });
-        User.findOne({ email }, (err, result) => {
-            if (err) return res.status(500).json({ error: err.message });
-            if (result)
-                return res
-                    .status(409)
-                    .json({ error: "Email is already in use" });
+        User.findOne({ email })
+            .then((result) => {
+                if (result)
+                    return res
+                        .status(409)
+                        .json({ error: "Email is already in use" });
 
-            const hash = bcryptjs.hashSync(password);
-            const user = new User({
-                firstname,
-                lastname,
-                email,
-                password: hash,
-            });
-            user.save()
-                .then((result) => {
-                    // this.sendEmail({ result });
-                    return res.status(201).json(result);
-                })
-                .catch((err) => {
-                    return res.status(500).json({
-                        error: err.message,
+                Car.findOne({ plate })
+                    .then((result) => {
+                        if (result)
+                            return res
+                                .status(409)
+                                .json({ error: "Car is already in use" });
+
+                        const car = new Car({ plate });
+                        car.save()
+                            .then((result) => {
+                                const hash = bcryptjs.hashSync(password);
+                                const user = new User({
+                                    firstname,
+                                    lastname,
+                                    email,
+                                    password: hash,
+                                    car: result._id,
+                                });
+                                user.save()
+                                    .then((result) => {
+                                        return res.status(201).json(result);
+                                    })
+                                    .catch((err) => {
+                                        return res.status(500).json({
+                                            error: err.message,
+                                        });
+                                    });
+                            })
+                            .catch((err) => {
+                                return res.status(500).json({
+                                    error: err.message,
+                                });
+                            });
+                    })
+                    .catch((err) => {
+                        return res.status(500).json({ error: err.message });
                     });
-                });
-        });
+            })
+            .catch((err) => {
+                return res.status(500).json({ error: err.message });
+            });
     } catch (err) {
         if (err.name === "ValidationError") {
             const messages = Object.values(err.errors).map(

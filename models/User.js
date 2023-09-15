@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Car = require("./Car");
 
 const userSchema = new mongoose.Schema({
     firstname: {
@@ -16,15 +17,15 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
-    phone: {
-        type: String,
-        trim: true,
-        default: "",
-    },
     password: {
         type: String,
         required: true,
         trim: true,
+    },
+    car: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Car",
+        required: true,
     },
     admin: {
         type: Boolean,
@@ -38,33 +39,8 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 1,
     },
-    videosCompleted: {
-        type: [String],
-        default: [],
-    },
-    coursesCompleted: {
-        type: [String],
-        default: [],
-    },
-    favourites: {
-        type: [String],
-        default: [],
-    },
-    school: {
-        type: String,
-        default: "",
-    },
     token: {
         type: String,
-        default: "",
-    },
-    goals: {
-        type: String,
-        default: "",
-    },
-    decksUsed: {
-        type: String,
-        trim: true,
         default: "",
     },
     createdDate: {
@@ -79,7 +55,6 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: null,
     },
-    // awards: [awardSchema],
     // userSettings: Settings,
 });
 

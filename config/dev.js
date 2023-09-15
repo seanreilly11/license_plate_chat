@@ -1,5 +1,5 @@
 module.exports = {
-    MONGO_URI: `mongodb+srv://devAccount:devAccount@aotearoadj.h7kk7.mongodb.net/AotearoaDJ`,
+    MONGO_URI: `mongodb+srv://test:admintest@licenseplatechat.lh4ebcj.mongodb.net/LicensePlateChat`,
     CLOUD_NAME: "aotearoadjs",
     CLOUDINARY_API_KEY: "228334344331647",
     CLOUDINARY_API_SECRET: "K6eqgFOfM2j8JG5c9ie0PpGj5j0",

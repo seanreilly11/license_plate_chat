@@ -26,7 +26,7 @@ const io = new Server(server, {
     },
 });
 
-const botName = "Chat Bot";
+const BOT_NAME = "Chat Bot";
 
 const videos = require("./routes/videos");
 const users = require("./routes/users");
@@ -62,7 +62,7 @@ io.on("connection", (socket) => {
         // Welcome current user only
         io.to(socket.id).emit(
             "message",
-            formatMessage(botName, "Welcome to ChatCord!", user.room)
+            formatMessage(BOT_NAME, "Welcome to ChatCord!", user.room)
         );
 
         // Broadcast when a user connects to everyone except latest user
@@ -71,7 +71,7 @@ io.on("connection", (socket) => {
             .emit(
                 "message",
                 formatMessage(
-                    botName,
+                    BOT_NAME,
                     `${user.username} has joined the chat`,
                     user.room
                 )
@@ -101,7 +101,7 @@ io.on("connection", (socket) => {
         if (user) {
             io.to(user.room).emit(
                 "message",
-                formatMessage(botName, `${user.username} has left the chat`)
+                formatMessage(BOT_NAME, `${user.username} has left the chat`)
             );
 
             // Send users and room info

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import socketIO from "socket.io-client";
+import MessageItem from "./MessageItem";
 const socket = socketIO.connect("http://localhost:4000", {
     autoConnect: false,
 });
@@ -12,7 +13,7 @@ function Chat() {
     const [messagesReceived, setMessagesReceived] = useState([]);
     const [messageText, setMessageText] = useState("");
     const joinedRef = useRef(false);
-    const user = search.get("user");
+    const user = search.get("user") || "User";
 
     const handleJoin = (e) => {
         if (joinedRef.current) return;
@@ -20,9 +21,7 @@ function Chat() {
         socket.auth = { username: user };
         socket.connect();
 
-        // const roomName = e.target.name;
         socket.emit("joinRoom", { username: user, room: id });
-
         joinedRef.current = true;
     };
 
@@ -40,21 +39,15 @@ function Chat() {
         });
         socket.on("message", (data) => {
             console.log(data);
-            setMessagesReceived((state) => [
-                ...state,
-                {
-                    message: data.message,
-                    username: data.username,
-                    room: data.room,
-                    time: data.time,
-                },
-            ]);
+            setMessagesReceived((state) => [...state, data]);
         });
 
         handleJoin();
 
-        // Remove event listener on component unmount
-        return () => socket.off("message");
+        return () => {
+            socket.off("message");
+            socket.offAny();
+        };
     }, [socket]);
 
     return (
@@ -65,10 +58,7 @@ function Chat() {
             <div className="p-3">
                 <h4>Messages</h4>
                 {messagesReceived?.map((msg) => (
-                    <div className="mb-3" key={msg.time}>
-                        <h6 className="mb-0">{msg.username}:</h6>
-                        <p>{msg.message}</p>
-                    </div>
+                    <MessageItem key={msg.time} msg={msg} user={user} />
                 ))}
             </div>
             <form onSubmit={handleSend}>
