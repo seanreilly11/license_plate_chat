@@ -1,25 +1,22 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import ChatListItem from "./ChatListItem";
+import { userActions } from "../redux/actions/user.actions";
 
 function ChatList() {
-    const [users, setUsers] = useState([]);
+    const users = useSelector((state) => state.users.items);
     const fetchedRef = useRef(false);
-
-    const fetchUserData = () => {
-        if (fetchedRef.current) return;
-        fetch("http://localhost:4000/api/v1/users")
-            .then((response) => response.json())
-            .then((data) => setUsers(data));
-        fetchedRef.current = true;
-    };
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        fetchUserData();
+        if (fetchedRef.current) return;
+        dispatch(userActions.getAll());
+        fetchedRef.current = true;
     }, []);
 
     return (
         <div>
-            {users.length > 0 ? (
+            {users?.length > 0 ? (
                 users?.map((user) => (
                     <ChatListItem user={user} key={user._id} />
                 ))

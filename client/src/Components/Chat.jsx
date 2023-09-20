@@ -61,7 +61,7 @@ function Chat() {
                     <MessageItem key={msg.time} msg={msg} user={user} />
                 ))}
             </div>
-            <form onSubmit={handleSend}>
+            <form className="chat-form" onSubmit={handleSend}>
                 <input
                     type="text"
                     value={messageText}

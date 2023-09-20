@@ -1,6 +1,6 @@
 const bcryptjs = require("bcryptjs");
 // const nodemailer = require("nodemailer");
-// const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Car = require("../models/Car");
 const Conversation = require("../models/Conversation");
@@ -287,7 +287,7 @@ exports.registerUser = async (req, res, next) => {
                                     lastname,
                                     email,
                                     password: hash,
-                                    car: result._id,
+                                    carId: result._id,
                                 });
                                 user.save()
                                     .then((result) => {

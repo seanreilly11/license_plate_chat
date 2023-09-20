@@ -28,7 +28,7 @@
     }
 }
 
-form {
+.chat-form {
     background: rgba(0, 0, 0, 0.15);
     padding: 0.25rem;
     position: fixed;
@@ -50,7 +50,7 @@ form {
 [type="text"]:focus {
     outline: none;
 }
-form > [type="submit"] {
+.chat-form > [type="submit"] {
     background: #333;
     border: none;
     padding: 0 1rem;
