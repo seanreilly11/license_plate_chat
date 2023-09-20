@@ -1,49 +1,28 @@
 const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema({
-    title: {
+    text: {
         type: String,
         required: true,
         trim: true,
     },
-    description: {
-        type: String,
-        default: "",
-    },
-    videos: {
-        type: [String],
-        default: [],
-    },
-    thumbnail: {
-        type: String,
-        default: "",
-    },
-    difficulty: {
-        type: Number,
-        default: 0,
-    },
-    previousCourse: {
+    conversationId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Course",
-    },
-    category: {
-        type: String,
+        ref: "Conversation",
         required: true,
-        // enum : ['DJ','Production'],
-        trim: true,
     },
-    totalStudents: {
+    senderId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
+    viewed: {
         type: Number,
         default: 0,
     },
     status: {
         type: Number,
         default: 1,
-    },
-    order: Number,
-    creatorId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
     },
     createdDate: {
         type: Date,
