@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
-    car: {
+    carId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Car",
         required: true,

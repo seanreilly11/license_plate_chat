@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const videoSchema = new mongoose.Schema({
+const conversationSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
@@ -59,4 +59,4 @@ const videoSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model("Video", videoSchema);
+module.exports = mongoose.model("Conversation", conversationSchema);

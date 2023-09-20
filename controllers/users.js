@@ -3,8 +3,8 @@ const bcryptjs = require("bcryptjs");
 // const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Car = require("../models/Car");
-const Video = require("../models/Video");
-const Course = require("../models/Course");
+const Conversation = require("../models/Conversation");
+const Message = require("../models/Message");
 const { JWT_TOKEN } = require("../config/keys");
 // const auth = require("../middlewares/auth");
 
@@ -17,11 +17,12 @@ exports.getUsers = async (req, res) => {
             {
                 $lookup: {
                     from: "cars",
-                    localField: "car",
+                    localField: "carId",
                     foreignField: "_id",
                     as: "carDetails",
                 },
             },
+            { $unwind: "$carDetails" },
         ]).sort({ lastLogin: -1 });
         return res.status(200).json(agg);
     } catch (err) {

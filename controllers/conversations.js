@@ -1,59 +1,59 @@
-const Course = require("../models/Course");
-const Video = require("../models/Video");
+const Conversation = require("../models/Conversation");
+const Message = require("../models/Message");
 const utils = require("./utils");
 
-// @desc Get all courses
-// @route GET /api/courses
-exports.getCourses = async (req, res, next) => {
+// @desc Get all conversation
+// @route GET /api/conversation
+exports.getConversations = async (req, res, next) => {
     try {
         const { accessLevel } = req.query;
         const filter = accessLevel == 1 ? {} : { status: utils.isActive() };
-        const courses = await Course.find(filter).sort({
+        const conversation = await Conversation.find(filter).sort({
             status: 1,
             createdDate: 1,
         }); // active ones on top sorted by date
 
-        return res.status(200).json(courses);
+        return res.status(200).json(conversation);
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
 };
 
 // @desc Get course by ID
-// @route GET /api/courses/:id
-exports.getCourseByID = async (req, res, next) => {
+// @route GET /api/conversation/:id
+exports.getConversationByID = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { accessLevel } = req.query;
         const filter =
             accessLevel == 1
-                ? { courseId: id }
-                : { courseId: id, status: utils.isActive() };
+                ? { conversationId: id }
+                : { conversationId: id, status: utils.isActive() };
 
-        const course = await Course.findById(id);
-        const videos = await Video.find(filter).sort({
+        const conversation = await Conversation.findById(id);
+        const message = await Message.find(filter).sort({
             status: 1,
             createdDate: 1,
         });
 
-        if (!course)
+        if (!conversation)
             return res.status(404).json({
-                error: "No course found",
+                error: "No conversation found",
             });
 
-        return res.status(200).json({ ...course._doc, videos });
+        return res.status(200).json({ ...conversation._doc, message });
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
 };
 
-// @desc Add new course
-// @route POST /api/courses
-exports.addCourse = async (req, res, next) => {
+// @desc Add new conversation
+// @route POST /api/conversation
+exports.addConversation = async (req, res, next) => {
     try {
-        const course = await Course.create(req.body);
+        const conversation = await Conversation.create(req.body);
 
-        return res.status(201).json(course);
+        return res.status(201).json(conversation);
     } catch (err) {
         if (err.name === "ValidationError") {
             const messages = Object.values(err.errors).map(
@@ -70,19 +70,19 @@ exports.addCourse = async (req, res, next) => {
     }
 };
 
-// @desc update course details
-// @route PATCH /api/courses/:id
-exports.updateCourse = async (req, res, next) => {
+// @desc update conversation details
+// @route PATCH /api/conversation/:id
+exports.updateConversation = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const courseCheck = await Course.findById(id);
+        const conversationCheck = await Conversation.findById(id);
 
-        if (!courseCheck)
+        if (!conversationCheck)
             return res.status(404).json({
-                error: "Course not found",
+                error: "Conversation not found",
             });
         else {
-            const course = await Course.updateOne(
+            const conversation = await Conversation.updateOne(
                 {
                     _id: id,
                 },
@@ -93,7 +93,7 @@ exports.updateCourse = async (req, res, next) => {
                     $set: req.body,
                 }
             );
-            return res.status(200).json(course);
+            return res.status(200).json(conversation);
         }
     } catch (err) {
         return res.status(500).json({
@@ -103,26 +103,26 @@ exports.updateCourse = async (req, res, next) => {
 };
 
 // TODO: fix this. Need to understand what it's actually for
-// @desc increment students count of course
-// @route PATCH /api/v1/courses/enrol?courseId=:courseId&userId=:userId
-exports.addStudentToCourse = async (req, res, next) => {
+// @desc increment students count of conversation
+// @route PATCH /api/v1/conversation/enrol?courseId=:courseId&userId=:userId
+exports.addStudentToConversation = async (req, res, next) => {
     try {
-        const { courseId, userId } = req.query;
+        const { conversationId, userId } = req.query;
         const user = await User.findById(userId);
-        const courseCheck = await Course.findById(courseId);
+        const conversationCheck = await Conversation.findById(conversationId);
 
-        if (!user || !courseCheck)
+        if (!user || !conversationCheck)
             return res.status(404).json({
-                error: "Course or user not found",
+                error: "conversation or user not found",
             });
-        else if (user.coursesCompleted.includes(courseId))
+        else if (user.conversationCompleted.includes(conversationId))
             return res.status(403).json({
-                error: "User already enrolled in course",
+                error: "User already enrolled in conversation",
             });
         else {
-            const course = await Course.updateOne(
+            const conversation = await Conversation.updateOne(
                 {
-                    _id: courseId,
+                    _id: conversationId,
                 },
                 {
                     $currentDate: {
@@ -139,7 +139,7 @@ exports.addStudentToCourse = async (req, res, next) => {
                     $currentDate: {
                         updatedDate: true,
                     },
-                    $push: { coursesCompleted: courseId },
+                    $push: { conversationCompleted: conversationId },
                 }
             );
             return res.status(200).json(video);
@@ -151,21 +151,21 @@ exports.addStudentToCourse = async (req, res, next) => {
     }
 };
 
-// @desc remove course
-// @route PATCH /api/v1/courses/remove/:id
-exports.removeCourse = async (req, res, next) => {
+// @desc remove conversation
+// @route PATCH /api/v1/conversation/remove/:id
+exports.removeConversation = async (req, res, next) => {
     try {
-        const { id: courseId } = req.params;
-        const courseCheck = await Course.findById(courseId);
+        const { id: conversationId } = req.params;
+        const conversationCheck = await Conversation.findById(conversationId);
 
-        if (!courseCheck)
+        if (!conversationCheck)
             return res.status(404).json({
-                error: "Course not found",
+                error: "conversation not found",
             });
         else {
-            const course = await Course.updateOne(
+            const conversation = await Conversation.updateOne(
                 {
-                    _id: courseId,
+                    _id: conversationId,
                 },
                 {
                     $currentDate: {
@@ -174,9 +174,9 @@ exports.removeCourse = async (req, res, next) => {
                     $set: { status: 2 },
                 }
             );
-            const videos = await Video.updateMany(
+            const message = await Message.updateMany(
                 {
-                    courseId: courseId,
+                    conversationId: conversationId,
                 },
                 {
                     $currentDate: {

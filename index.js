@@ -28,18 +28,18 @@ const io = new Server(server, {
 
 const BOT_NAME = "Chat Bot";
 
-const videos = require("./routes/videos");
+const messages = require("./routes/messages");
 const users = require("./routes/users");
-const courses = require("./routes/courses");
+const conversations = require("./routes/conversations");
 
 app.use((req, res, next) => {
     console.log(`${req.method} request for ${req.url}`);
     next();
 });
 
-app.use("/api/v1/videos", videos);
+app.use("/api/v1/conversations", conversations);
 app.use("/api/v1/users", users);
-app.use("/api/v1/courses", courses);
+app.use("/api/v1/messages", messages);
 
 // io.use((socket, next) => {
 //     const username = socket.handshake.auth.username;
