@@ -60,10 +60,10 @@ io.on("connection", (socket) => {
         socket.join(user.room);
 
         // Welcome current user only
-        io.to(socket.id).emit(
-            "message",
-            formatMessage(BOT_NAME, "Welcome to ChatCord!", user.room)
-        );
+        // io.to(socket.id).emit(
+        //     "message",
+        //     formatMessage(BOT_NAME, "Welcome to ChatCord!", user.room)
+        // );
 
         // Broadcast when a user connects to everyone except latest user
         socket

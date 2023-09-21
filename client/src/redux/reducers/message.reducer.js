@@ -1,3 +1,4 @@
+import { conversationConstants } from "../constants/conversation.constants";
 import { messageConstants } from "../constants/message.constants";
 
 const initialState = {
@@ -5,7 +6,6 @@ const initialState = {
     items: [],
     error: null,
     item: null,
-    loadingSingle: false,
 };
 
 export function messages(state = initialState, action) {
@@ -29,7 +29,6 @@ export function messages(state = initialState, action) {
                 loading: false,
                 items: [],
                 item: null,
-                loadingSingle: false,
             };
         //
         // GET SINGLE
@@ -38,12 +37,12 @@ export function messages(state = initialState, action) {
             return {
                 ...state,
                 item: null,
-                loadingSingle: true,
+                loading: true,
             };
         case messageConstants.GETSINGLE_SUCCESS:
             return {
                 ...state,
-                loadingSingle: false,
+                loading: false,
                 item: action.data,
             };
         case messageConstants.GETSINGLE_FAILURE:
@@ -51,7 +50,7 @@ export function messages(state = initialState, action) {
                 ...state,
                 error: action.error,
                 item: null,
-                loadingSingle: false,
+                loading: false,
             };
         //
         // VIEW message
@@ -82,6 +81,29 @@ export function messages(state = initialState, action) {
         case messageConstants.COMPLETEMESSAGE_FAILURE:
             return {
                 ...state,
+            };
+        // //
+        // // GET CONVERSATION MESSAGES
+        // //
+        case conversationConstants.GETSINGLE_REQUEST:
+            return {
+                ...state,
+                items: null,
+                loading: true,
+            };
+        case conversationConstants.GETSINGLE_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                items: action.data.messages,
+            };
+
+        case conversationConstants.GETSINGLE_FAILURE:
+            return {
+                error: action.error,
+                loading: false,
+                items: [],
+                item: null,
             };
         // //
         // // TAKE LEAD
