@@ -6,6 +6,7 @@ import { userActions } from "./user.actions";
 export const messageActions = {
     getAll,
     getSingle,
+    newMessage,
     viewMessage,
     completeMessage,
 };
@@ -53,6 +54,29 @@ function getSingle(id) {
     }
     function failure(error) {
         return { type: messageConstants.GETSINGLE_FAILURE, error };
+    }
+}
+
+function newMessage(msg) {
+    return (dispatch) => {
+        dispatch(request());
+
+        messageService.newMessage(msg).then(
+            (data) => dispatch(success(data)),
+            (error) => {
+                dispatch(failure(error));
+            }
+        );
+    };
+
+    function request() {
+        return { type: messageConstants.NEWMESSAGE_REQUEST };
+    }
+    function success(data) {
+        return { type: messageConstants.NEWMESSAGE_SUCCESS, data };
+    }
+    function failure(error) {
+        return { type: messageConstants.NEWMESSAGE_FAILURE, error };
     }
 }
 

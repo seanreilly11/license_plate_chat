@@ -1,4 +1,5 @@
 import React from "react";
+import moment from "moment";
 
 function MessageItem({ msg, user }) {
     return (
@@ -9,6 +10,7 @@ function MessageItem({ msg, user }) {
             }}
         >
             <h6 className="mb-0">{msg.senderId}:</h6>
+            <small>{moment(msg.createdDate).fromNow()}</small>
             <p>{msg.text}</p>
         </div>
     );

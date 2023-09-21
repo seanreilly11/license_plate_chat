@@ -1,9 +1,9 @@
-function formatMessage(username, message, room) {
+function formatMessage({ senderId, text, conversationId }) {
     return {
-        username,
-        message,
-        room,
-        time: Date.now(),
+        senderId,
+        text,
+        conversationId,
+        createdDate: Date.now(),
     };
 }
 

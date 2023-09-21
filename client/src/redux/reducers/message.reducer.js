@@ -53,6 +53,26 @@ export function messages(state = initialState, action) {
                 loading: false,
             };
         //
+        // SEND MESSAGE
+        //
+        case messageConstants.NEWMESSAGE_REQUEST:
+            return {
+                ...state,
+                loading: true,
+            };
+        case messageConstants.NEWMESSAGE_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                items: [...state.items, action.data],
+            };
+        case messageConstants.NEWMESSAGE_FAILURE:
+            return {
+                ...state,
+                error: action.error,
+                loading: false,
+            };
+        //
         // VIEW message
         //
         case messageConstants.VIEWMESSAGE_REQUEST:

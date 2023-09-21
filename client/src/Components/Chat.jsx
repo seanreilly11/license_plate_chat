@@ -5,6 +5,7 @@ import MessageItem from "./MessageItem";
 import { useDispatch, useSelector } from "react-redux";
 import { conversationActions } from "../redux/actions/conversation.actions";
 import { useAuth } from "../hooks/useAuth";
+import { messageActions } from "../redux/actions/message.actions";
 const socket = socketIO.connect("http://localhost:4000", {
     autoConnect: false,
 });
@@ -27,12 +28,16 @@ function Chat() {
         socket.emit("joinRoom", { username: user.firstname, room: id });
         joinedRef.current = true;
     };
-    console.log(messagesReceived);
 
     const handleSend = (e) => {
         e.preventDefault();
         if (messageText) {
-            socket.emit("chatMessage", messageText);
+            const msg = {
+                text: messageText,
+                senderId: user.id,
+                conversationId: id,
+            };
+            socket.emit("chatMessage", msg);
             setMessageText("");
         }
     };
@@ -43,8 +48,7 @@ function Chat() {
         });
         socket.on("message", (data) => {
             console.log(data);
-            // dispatch(message)
-            // setMessagesReceived((state) => [...state, data]);
+            dispatch(messageActions.newMessage(data));
         });
 
         dispatch(conversationActions.getSingle(id));

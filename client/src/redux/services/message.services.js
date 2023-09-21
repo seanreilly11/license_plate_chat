@@ -4,6 +4,7 @@ import { authHeader } from "../authHeader"; // any repeating header for ajax
 export const messageService = {
     getAll,
     getSingle,
+    newMessage,
     viewMessage,
     completeMessage,
 };
@@ -44,6 +45,16 @@ async function getSingle(id) {
     return fetch(`${config.env}/messages/${id}`, requestOptions).then(
         handleResponse
     );
+}
+
+async function newMessage(msg) {
+    const requestOptions = {
+        method: "POST",
+        headers: authHeader(),
+        body: JSON.stringify(msg),
+    };
+
+    return fetch(`${config.env}/messages`, requestOptions).then(handleResponse);
 }
 
 async function viewMessage(id) {
