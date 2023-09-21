@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import socketIO from "socket.io-client";
 import MessageItem from "./MessageItem";
+import { useDispatch, useSelector } from "react-redux";
+import { conversationActions } from "../redux/actions/conversation.actions";
+import { useAuth } from "../hooks/useAuth";
 const socket = socketIO.connect("http://localhost:4000", {
     autoConnect: false,
 });
@@ -10,18 +13,22 @@ function Chat() {
     const { id } = useParams();
     const [search, setSearch] = useSearchParams();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const reduxMessages = useSelector(
+        (state) => state.conversations.item?.messages
+    );
     const [messagesReceived, setMessagesReceived] = useState([]);
     const [messageText, setMessageText] = useState("");
     const joinedRef = useRef(false);
-    const user = search.get("user") || "User";
+    const user = useAuth();
 
     const handleJoin = (e) => {
         if (joinedRef.current) return;
 
-        socket.auth = { username: user };
+        socket.auth = { username: user.firstname };
         socket.connect();
 
-        socket.emit("joinRoom", { username: user, room: id });
+        socket.emit("joinRoom", { username: user.firstname, room: id });
         joinedRef.current = true;
     };
 
@@ -41,7 +48,7 @@ function Chat() {
             console.log(data);
             setMessagesReceived((state) => [...state, data]);
         });
-
+        dispatch(conversationActions.getSingle(id));
         handleJoin();
 
         return () => {
@@ -57,8 +64,8 @@ function Chat() {
             </header>
             <div className="p-3">
                 <h4>Messages</h4>
-                {messagesReceived?.map((msg) => (
-                    <MessageItem key={msg.time} msg={msg} user={user} />
+                {reduxMessages?.map((msg) => (
+                    <MessageItem key={msg._id} msg={msg} user={user} />
                 ))}
             </div>
             <form className="chat-form" onSubmit={handleSend}>

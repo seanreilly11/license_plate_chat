@@ -5,12 +5,11 @@ function MessageItem({ msg, user }) {
         <div
             className="mb-3"
             style={{
-                textAlign: msg.username === user ? "right" : "left",
+                textAlign: msg.senderId === user.id ? "right" : "left",
             }}
-            key={msg.time}
         >
-            <h6 className="mb-0">{msg.username}:</h6>
-            <p>{msg.message}</p>
+            <h6 className="mb-0">{msg.senderId}:</h6>
+            <p>{msg.text}</p>
         </div>
     );
 }

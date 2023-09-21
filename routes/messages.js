@@ -5,7 +5,7 @@ const {
     getMessages,
     addMessage,
     getMessageByID,
-    getMessagesByCourse,
+    getMessagesByConversation,
     viewMessage,
     removeMessage,
     updateMessage,
@@ -18,7 +18,7 @@ router.route("/complete").patch(completeMessage);
 
 router.route("/:id").get(getMessageByID).patch(updateMessage);
 
-router.route("/courses/:id").get(getMessagesByCourse);
+router.route("/courses/:id").get(getMessagesByConversation);
 
 router.route("/view/:id").patch(viewMessage);
 

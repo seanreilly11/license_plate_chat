@@ -13,7 +13,7 @@ const { JWT_TOKEN } = require("../config/keys");
 exports.getUsers = async (req, res) => {
     try {
         // const users = await User.find().sort({ lastLogin: -1 });
-        const agg = await User.aggregate([
+        const users = await User.aggregate([
             {
                 $lookup: {
                     from: "cars",
@@ -24,7 +24,7 @@ exports.getUsers = async (req, res) => {
             },
             { $unwind: "$carDetails" },
         ]).sort({ lastLogin: -1 });
-        return res.status(200).json(agg);
+        return res.status(200).json(users);
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }

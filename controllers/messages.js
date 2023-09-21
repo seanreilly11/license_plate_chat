@@ -40,9 +40,9 @@ exports.getMessageByID = async (req, res, next) => {
 exports.addMessage = async (req, res, next) => {
     try {
         const message = await Message.create(req.body);
-        const course = await Course.updateOne(
+        const conversation = await Conversation.updateOne(
             {
-                _id: req.body.courseId,
+                _id: req.body.conversationId,
             },
             { $push: { messages: message._id } }
         );
@@ -55,7 +55,7 @@ exports.addMessage = async (req, res, next) => {
 
 // @desc Get message by course. Don't really need as messages are returned with course details
 // @route GET /api/v1/messages/courses/:id
-exports.getMessagesByCourse = async (req, res, next) => {
+exports.getMessagesByConversation = async (req, res, next) => {
     try {
         const messages = await Message.find({ courseId: req.params.id });
 

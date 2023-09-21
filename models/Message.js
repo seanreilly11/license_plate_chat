@@ -16,6 +16,7 @@ const messageSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
+    senderName: String,
     viewed: {
         type: Number,
         default: 0,

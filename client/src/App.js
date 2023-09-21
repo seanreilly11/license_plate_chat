@@ -5,6 +5,7 @@ import Home from "./Components/Home";
 import Chat from "./Components/Chat";
 import ChatList from "./Components/ChatList";
 import Login from "./Components/Login";
+import PrivateRoute from "./Components/PrivateRoute";
 import { history } from "./hooks/useHistory";
 
 function App() {
@@ -17,8 +18,22 @@ function App() {
             <h1>License Plate Chat App</h1>
             <Routes>
                 <Route path="/" element={<Login />} />
-                <Route path="/home" element={<ChatList />} />
-                <Route path="/chat/:id" element={<Chat />} />
+                <Route
+                    path="/home"
+                    element={
+                        <PrivateRoute>
+                            <ChatList />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/chat/:id"
+                    element={
+                        <PrivateRoute>
+                            <Chat />
+                        </PrivateRoute>
+                    }
+                />
             </Routes>
         </div>
     );
