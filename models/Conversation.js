@@ -6,20 +6,14 @@ const conversationSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
-    messages: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Message",
-            default: [],
-        },
-    ],
-    users: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            default: [],
-        },
-    ],
+    messages: {
+        type: [String],
+        default: [],
+    },
+    users: {
+        type: [String],
+        default: [],
+    },
     status: {
         type: Number,
         default: 1,

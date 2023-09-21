@@ -31,8 +31,7 @@ exports.getConversationByID = async (req, res, next) => {
                 : { conversationId: id, status: utils.isActive() };
 
         const conversation = await Conversation.findById(id);
-        const message = await Message.find(filter).sort({
-            status: 1,
+        const messages = await Message.find(filter).sort({
             createdDate: 1,
         });
 
@@ -41,19 +40,55 @@ exports.getConversationByID = async (req, res, next) => {
                 error: "No conversation found",
             });
 
-        return res.status(200).json({ ...conversation._doc, message });
+        return res.status(200).json({ ...conversation._doc, messages });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+};
+
+// @desc Get conversation Id by convo ID if exists otherwise create it
+// @route GET /api/conversation/find/:id
+exports.getConversationByConvoID = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const filter = { conversationId: id, status: utils.isActive() };
+
+        const conversation = await Conversation.findOne(filter);
+
+        if (conversation) return res.status(200).json(conversation);
+
+        return this.createConversation({ body: { conversationId: id } }, res);
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
 };
 
 // @desc Add new conversation
-// @route POST /api/conversation
-exports.addConversation = async (req, res, next) => {
+// @route POST /api/conversations
+exports.createConversation = async (req, res, next) => {
     try {
-        const conversation = await Conversation.create(req.body);
+        const { conversationId } = req.body;
+        const conversation = await Conversation.findOne({ conversationId });
 
-        return res.status(201).json(conversation);
+        if (conversation)
+            return res.status(409).json({
+                error: conversation,
+            });
+
+        const newConversation = new Conversation({
+            conversationId,
+            users: conversationId.split("||"),
+        });
+        newConversation
+            .save()
+            .then((result) => {
+                return res.status(201).json(result);
+            })
+            .catch((err) => {
+                return res.status(500).json({
+                    error: err.message,
+                });
+            });
     } catch (err) {
         if (err.name === "ValidationError") {
             const messages = Object.values(err.errors).map(

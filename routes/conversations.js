@@ -3,12 +3,15 @@ const router = express.Router();
 const {
     getConversations,
     getConversationByID,
-    addConversation,
+    getConversationByConvoID,
+    createConversation,
     updateConversation,
     removeConversation,
 } = require("../controllers/conversations");
 
-router.route("/").get(getConversations).post(addConversation);
+router.route("/").get(getConversations).post(createConversation);
+
+router.route("/find/:id").get(getConversationByConvoID);
 
 router.route("/:id").get(getConversationByID).patch(updateConversation);
 

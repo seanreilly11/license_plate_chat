@@ -1,10 +1,10 @@
 import { config } from "../../config"; // config file for base url
 import { authHeader } from "../authHeader";
-// import { authHeader } from "../authHeader"; // any repeating header for ajax
 
 export const conversationService = {
     getAll,
     getSingle,
+    findConversationId,
 };
 
 function handleResponse(response) {
@@ -43,6 +43,17 @@ async function getSingle(id) {
     };
 
     return fetch(`${config.env}/conversations/${id}`, requestOptions).then(
+        handleResponse
+    );
+}
+
+async function findConversationId(id) {
+    const requestOptions = {
+        method: "GET",
+        headers: authHeader(),
+    };
+
+    return fetch(`${config.env}/conversations/find/${id}`, requestOptions).then(
         handleResponse
     );
 }

@@ -5,7 +5,6 @@ const initialState = {
     items: [],
     error: null,
     item: null,
-    loadingSingle: false,
 };
 
 export function conversations(state = initialState, action) {
@@ -30,7 +29,6 @@ export function conversations(state = initialState, action) {
                 loading: false,
                 items: [],
                 item: null,
-                loadingSingle: false,
             };
         // //
         // // GET SINGLE
@@ -39,12 +37,12 @@ export function conversations(state = initialState, action) {
             return {
                 ...state,
                 item: null,
-                loadingSingle: true,
+                loading: true,
             };
         case conversationConstants.GETSINGLE_SUCCESS:
             return {
                 ...state,
-                loadingSingle: false,
+                loading: false,
                 item: action.data,
             };
         case conversationConstants.GETSINGLE_FAILURE:
@@ -53,7 +51,36 @@ export function conversations(state = initialState, action) {
                 loading: false,
                 items: [],
                 item: null,
-                loadingSingle: false,
+            };
+        // //
+        // // FIND CONVO
+        // //
+        case conversationConstants.FINDCONVO_REQUEST:
+            return {
+                ...state,
+                item: null,
+                loading: true,
+            };
+        case conversationConstants.FINDCONVO_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                item: action.data,
+            };
+        case conversationConstants.FINDCONVO_FAILURE:
+            return {
+                error: action.error,
+                loading: false,
+                items: [],
+                item: null,
+            };
+        // //
+        // // REMOVE FOUND CONVO
+        // //
+        case conversationConstants.REMOVECONVO_REQUEST:
+            return {
+                ...state,
+                item: null,
             };
         // //
         // // TAKE LEAD
