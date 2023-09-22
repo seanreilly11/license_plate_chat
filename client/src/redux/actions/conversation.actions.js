@@ -4,6 +4,7 @@ import { conversationService } from "../services/conversation.services";
 export const conversationActions = {
     getAll,
     getSingle,
+    getUserConversations,
     findConversationId,
     removeFoundConvo,
 };
@@ -53,6 +54,29 @@ function getSingle(id) {
     }
     function failure(error) {
         return { type: conversationConstants.GETSINGLE_FAILURE, error };
+    }
+}
+
+function getUserConversations(id) {
+    return (dispatch) => {
+        dispatch(request());
+
+        conversationService.getUserConversations(id).then(
+            (data) => dispatch(success(data)),
+            (error) => {
+                dispatch(failure(error));
+            }
+        );
+    };
+
+    function request() {
+        return { type: conversationConstants.GETUSERCONVO_REQUEST };
+    }
+    function success(data) {
+        return { type: conversationConstants.GETUSERCONVO_SUCCESS, data };
+    }
+    function failure(error) {
+        return { type: conversationConstants.GETUSERCONVO_FAILURE, error };
     }
 }
 

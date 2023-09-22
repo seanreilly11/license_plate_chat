@@ -1,6 +1,7 @@
 const bcryptjs = require("bcryptjs");
 // const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 const User = require("../models/User");
 const Car = require("../models/Car");
 const Conversation = require("../models/Conversation");
@@ -35,9 +36,47 @@ exports.getUsers = async (req, res) => {
 exports.getUserByID = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
+        const conversations = await Conversation.find({
+            users: { $in: [req.params.id] },
+        });
+        let otherUserId;
+        conversations.forEach((convos) => {
+            convos.users.forEach((_user) => {
+                if (_user != req.params.id) otherUserId = _user;
+            });
+        });
+        let otherUser = await User.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(otherUserId) } },
+            {
+                $lookup: {
+                    from: "cars",
+                    localField: "carId",
+                    foreignField: "_id",
+                    as: "carDetails",
+                },
+            },
+            { $unwind: "$carDetails" },
+        ]);
+        conversations.forEach((convo, i) => {
+            if (convo.users.includes(otherUserId)) {
+                const { firstname, lastname, carDetails } = {
+                    ...otherUser["0"],
+                };
+                conversations[i] = {
+                    ...conversations[i]._doc,
+                    userDetails: { firstname, lastname, carDetails },
+                };
+            }
+        });
+
         if (!user) return res.status(404).json({ error: "No user found" });
 
-        return res.status(200).json(user);
+        return res.status(200).json({
+            ...user._doc,
+            conversations,
+            password: undefined,
+            token: undefined,
+        });
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }

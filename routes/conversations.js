@@ -3,6 +3,7 @@ const router = express.Router();
 const {
     getConversations,
     getConversationByID,
+    getConversationsByUser,
     getConversationByConvoID,
     createConversation,
     updateConversation,
@@ -10,6 +11,8 @@ const {
 } = require("../controllers/conversations");
 
 router.route("/").get(getConversations).post(createConversation);
+
+router.route("/user/:id").get(getConversationsByUser);
 
 router.route("/find/:id").get(getConversationByConvoID);
 

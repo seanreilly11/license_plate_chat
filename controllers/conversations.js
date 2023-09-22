@@ -46,6 +46,30 @@ exports.getConversationByID = async (req, res, next) => {
     }
 };
 
+// @desc Get users conversations
+// @route GET /api/conversation/:id
+exports.getConversationsByUser = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { accessLevel } = req.query;
+        const filter =
+            accessLevel == 1
+                ? { users: { $in: [id] } }
+                : { users: { $in: [id] }, status: utils.isActive() };
+
+        const conversations = await Conversation.find(filter, {});
+
+        if (!conversations)
+            return res.status(404).json({
+                error: "No conversation found",
+            });
+
+        return res.status(200).json(conversations);
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+};
+
 // @desc Get conversation Id by convo ID if exists otherwise create it
 // @route GET /api/conversation/find/:id
 exports.getConversationByConvoID = async (req, res, next) => {

@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { conversationActions } from "../redux/actions/conversation.actions";
 import { useAuth } from "../hooks/useAuth";
 import { messageActions } from "../redux/actions/message.actions";
+import Spinner from "./Spinner";
 const socket = socketIO.connect("http://localhost:4000", {
     autoConnect: false,
 });
@@ -67,9 +68,18 @@ function Chat() {
             </header>
             <div className="p-3">
                 <h4>Messages</h4>
-                {messagesReceived?.map((msg) => (
-                    <MessageItem key={msg._id} msg={msg} user={user} />
-                ))}
+                {messagesReceived?.length > 0 ? (
+                    messagesReceived?.map((msg, i) => (
+                        <MessageItem
+                            key={msg._id}
+                            msg={msg}
+                            user={user}
+                            prev={messagesReceived[i - 1]?.createdDate}
+                        />
+                    ))
+                ) : (
+                    <Spinner />
+                )}
             </div>
             <form className="chat-form" onSubmit={handleSend}>
                 <input

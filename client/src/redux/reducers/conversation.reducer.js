@@ -5,6 +5,7 @@ const initialState = {
     items: [],
     error: null,
     item: null,
+    convoId: null,
 };
 
 export function conversations(state = initialState, action) {
@@ -53,26 +54,45 @@ export function conversations(state = initialState, action) {
                 item: null,
             };
         // //
+        // // GET USER CONVO
+        // //
+        case conversationConstants.GETUSERCONVO_REQUEST:
+            return {
+                ...state,
+                loading: true,
+            };
+        case conversationConstants.GETUSERCONVO_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                items: action.data,
+            };
+        case conversationConstants.GETUSERCONVO_FAILURE:
+            return {
+                error: action.error,
+                loading: false,
+                items: [],
+            };
+        // //
         // // FIND CONVO
         // //
         case conversationConstants.FINDCONVO_REQUEST:
             return {
                 ...state,
-                item: null,
+                convoId: null,
                 loading: true,
             };
         case conversationConstants.FINDCONVO_SUCCESS:
             return {
                 ...state,
                 loading: false,
-                item: action.data,
+                convoId: action.data._id,
             };
         case conversationConstants.FINDCONVO_FAILURE:
             return {
                 error: action.error,
                 loading: false,
-                items: [],
-                item: null,
+                convoId: [],
             };
         // //
         // // REMOVE FOUND CONVO
@@ -80,7 +100,7 @@ export function conversations(state = initialState, action) {
         case conversationConstants.REMOVECONVO_REQUEST:
             return {
                 ...state,
-                item: null,
+                convoId: null,
             };
         // //
         // // TAKE LEAD

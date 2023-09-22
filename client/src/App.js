@@ -14,28 +14,25 @@ function App() {
     history.location = useLocation();
 
     return (
-        <div>
-            <h1>License Plate Chat App</h1>
-            <Routes>
-                <Route path="/" element={<Login />} />
-                <Route
-                    path="/home"
-                    element={
-                        <PrivateRoute>
-                            <ChatList />
-                        </PrivateRoute>
-                    }
-                />
-                <Route
-                    path="/chat/:id"
-                    element={
-                        <PrivateRoute>
-                            <Chat />
-                        </PrivateRoute>
-                    }
-                />
-            </Routes>
-        </div>
+        <Routes>
+            <Route path="/" element={<Login />} />
+            <Route
+                path="/home"
+                element={
+                    <PrivateRoute>
+                        <ChatList />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/chat/:id"
+                element={
+                    <PrivateRoute>
+                        <Chat />
+                    </PrivateRoute>
+                }
+            />
+        </Routes>
     );
 }
 

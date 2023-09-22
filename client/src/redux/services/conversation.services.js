@@ -4,6 +4,7 @@ import { authHeader } from "../authHeader";
 export const conversationService = {
     getAll,
     getSingle,
+    getUserConversations,
     findConversationId,
 };
 
@@ -43,6 +44,17 @@ async function getSingle(id) {
     };
 
     return fetch(`${config.env}/conversations/${id}`, requestOptions).then(
+        handleResponse
+    );
+}
+
+async function getUserConversations(id) {
+    const requestOptions = {
+        method: "GET",
+        headers: authHeader(),
+    };
+
+    return fetch(`${config.env}/conversations/user/${id}`, requestOptions).then(
         handleResponse
     );
 }
