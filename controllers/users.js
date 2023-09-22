@@ -33,26 +33,22 @@ exports.getUsers = async (req, res) => {
 
 // @desc Get user by plate
 // @route GET /api/v1/users/plate/:plate
-exports.getUserByPlate = async (req, res) => {
+exports.getUsersByPlate = async (req, res) => {
     try {
-        const car = await Car.find({
-            plate: { $regex: req.params.plate.toUpperCase() },
-        });
-        if (!car) return res.status(200).json({});
-        const user = await User.aggregate([
-            { $match: { carId: car._id } },
+        const cars = await Car.aggregate([
+            { $match: { plate: { $regex: req.params.plate.toUpperCase() } } },
             {
                 $lookup: {
-                    from: "cars",
-                    localField: "carId",
-                    foreignField: "_id",
-                    as: "carDetails",
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "carId",
+                    as: "userDetails",
                 },
             },
-            { $unwind: "$carDetails" },
+            // { $project: { "userDetails.firstname": 1, lastname: 1, _id: 1 } },
+            { $unwind: "$userDetails" },
         ]);
-        const { firstname, lastname, carDetails } = user["0"];
-        return res.status(200).json({ firstname, lastname, carDetails });
+        return res.status(200).json(cars);
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }

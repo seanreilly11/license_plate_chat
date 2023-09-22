@@ -10,7 +10,7 @@ const {
     loginUser,
     logoutUser,
     loginAdminUser,
-    getUserByPlate,
+    getUsersByPlate,
     getUsersCompletedItems,
     getUserStats,
 } = require("../controllers/users");
@@ -27,7 +27,7 @@ router.route("/adminlogin").post(loginAdminUser);
 
 router.route("/adminrights").patch(makeUserAdmin);
 
-router.route("/plate/:plate").get(getUserByPlate);
+router.route("/plate/:plate").get(getUsersByPlate);
 
 router.route("/completed/:id").get(getUsersCompletedItems);
 

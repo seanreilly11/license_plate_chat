@@ -18,6 +18,7 @@ function Chat() {
     const messagesReceived = useSelector((state) => state.messages.items);
     const [messageText, setMessageText] = useState("");
     const joinedRef = useRef(false);
+    const scrollToRef = useRef(null);
     const user = useAuth();
 
     const handleJoin = (e) => {
@@ -61,13 +62,16 @@ function Chat() {
         };
     }, [socket]);
 
+    useEffect(() => {
+        scrollToRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messagesReceived]);
+
     return (
         <div>
-            <header className="p-3">
+            <header className="chat-header">
                 <button onClick={() => navigate(-1)}>{"<"}</button>Chat {id}
             </header>
-            <div className="p-3">
-                <h4>Messages</h4>
+            <div className="message-list">
                 {messagesReceived?.length > 0 ? (
                     messagesReceived?.map((msg, i) => (
                         <MessageItem
@@ -80,6 +84,7 @@ function Chat() {
                 ) : (
                     <Spinner />
                 )}
+                <div ref={scrollToRef}></div>
             </div>
             <form className="chat-form" onSubmit={handleSend}>
                 <input
