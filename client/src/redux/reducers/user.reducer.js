@@ -57,6 +57,27 @@ export function users(state = initialState, action) {
                 completed: null,
             };
         //
+        // GET PLATE USERS
+        //
+        case userConstants.GETPLATEUSERS_REQUEST:
+            return {
+                ...state,
+                loading: true,
+                items: null,
+            };
+        case userConstants.GETPLATEUSERS_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                items: action.data,
+            };
+        case userConstants.GETPLATEUSERS_FAILURE:
+            return {
+                error: action.error,
+                loading: false,
+                items: [],
+            };
+        //
         // GET USER STATS
         //
         case userConstants.GET_USER_STATS_REQUEST:

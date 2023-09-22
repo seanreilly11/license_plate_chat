@@ -6,6 +6,7 @@ import { userService } from "../services/user.services";
 export const userActions = {
     getSingle,
     getAll,
+    getPlateUsers,
     getUserStats,
     getCompletedItems,
 };
@@ -53,6 +54,29 @@ function getAll() {
     }
     function failure(error) {
         return { type: userConstants.GETALL_FAILURE, error };
+    }
+}
+
+function getPlateUsers(plate) {
+    return (dispatch) => {
+        dispatch(request());
+
+        userService.getPlateUsers(plate).then(
+            (data) => dispatch(success(data)),
+            (error) => {
+                dispatch(failure(error));
+            }
+        );
+    };
+
+    function request() {
+        return { type: userConstants.GETPLATEUSERS_REQUEST };
+    }
+    function success(data) {
+        return { type: userConstants.GETPLATEUSERS_SUCCESS, data };
+    }
+    function failure(error) {
+        return { type: userConstants.GETPLATEUSERS_FAILURE, error };
     }
 }
 

@@ -31,6 +31,33 @@ exports.getUsers = async (req, res) => {
     }
 };
 
+// @desc Get user by plate
+// @route GET /api/v1/users/plate/:plate
+exports.getUserByPlate = async (req, res) => {
+    try {
+        const car = await Car.find({
+            plate: { $regex: req.params.plate.toUpperCase() },
+        });
+        if (!car) return res.status(200).json({});
+        const user = await User.aggregate([
+            { $match: { carId: car._id } },
+            {
+                $lookup: {
+                    from: "cars",
+                    localField: "carId",
+                    foreignField: "_id",
+                    as: "carDetails",
+                },
+            },
+            { $unwind: "$carDetails" },
+        ]);
+        const { firstname, lastname, carDetails } = user["0"];
+        return res.status(200).json({ firstname, lastname, carDetails });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+};
+
 // @desc Get user by ID
 // @route GET /api/v1/users/:id
 exports.getUserByID = async (req, res) => {

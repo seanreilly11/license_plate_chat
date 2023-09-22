@@ -5,6 +5,7 @@ import { authHeader } from "../authHeader";
 export const userService = {
     getSingle,
     getAll,
+    getPlateUsers,
     getUserStats,
     getCompletedItems,
 };
@@ -41,10 +42,21 @@ async function getSingle(id) {
 async function getAll() {
     const requestOptions = {
         method: "GET",
-        // headers: authHeader(),
+        headers: authHeader(),
     };
 
     return fetch(`${config.env}/users`, requestOptions).then(handleResponse);
+}
+
+async function getPlateUsers(plate) {
+    const requestOptions = {
+        method: "GET",
+        headers: authHeader(),
+    };
+
+    return fetch(`${config.env}/users/plate/${plate}`, requestOptions).then(
+        handleResponse
+    );
 }
 
 async function getUserStats(id) {
