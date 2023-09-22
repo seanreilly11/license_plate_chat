@@ -49,7 +49,6 @@ function Chat() {
             console.log(event, args);
         });
         socket.on("message", (data) => {
-            console.log(data);
             dispatch(messageActions.newMessage(data));
         });
 

@@ -41,12 +41,14 @@ export function authentication(state = initialState, action) {
                 ...state,
                 id: null,
                 token: null,
+                name: null,
             };
         case authenticationConstants.SIGN_OUT_FAILURE:
             return {
                 error: action.error,
                 token: null,
                 id: null,
+                name: null,
                 loading: false,
             };
         case authenticationConstants.VERIFY_EMAIL_REQUEST:
