@@ -16,8 +16,10 @@ function Chat() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const messagesReceived = useSelector((state) => state.messages.items);
+    const loading = useSelector((state) => state.messages.loading);
     const [messageText, setMessageText] = useState("");
     const joinedRef = useRef(false);
+    const isFirstViewRef = useRef(true);
     const scrollToRef = useRef(null);
     const user = useAuth();
 
@@ -62,6 +64,10 @@ function Chat() {
     }, [socket]);
 
     useEffect(() => {
+        if (isFirstViewRef.current && !loading && messagesReceived?.length) {
+            scrollToRef.current?.scrollIntoView({ behavior: "auto" });
+            isFirstViewRef.current = false;
+        }
         scrollToRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messagesReceived]);
 
@@ -71,17 +77,21 @@ function Chat() {
                 <button onClick={() => navigate(-1)}>{"<"}</button>Chat {id}
             </header>
             <div className="message-list">
-                {messagesReceived?.length > 0 ? (
-                    messagesReceived?.map((msg, i) => (
-                        <MessageItem
-                            key={msg._id}
-                            msg={msg}
-                            user={user}
-                            prev={messagesReceived[i - 1]?.createdDate}
-                        />
-                    ))
-                ) : (
-                    <Spinner />
+                {messagesReceived?.map((msg, i) => (
+                    <MessageItem
+                        key={msg._id}
+                        msg={msg}
+                        user={user}
+                        prev={messagesReceived[i - 1]?.createdDate}
+                    />
+                ))}
+                {!loading && messagesReceived?.length < 1 && (
+                    <div className="mt-3">No messages</div>
+                )}
+                {loading && (
+                    <div className="mt-3">
+                        <Spinner />
+                    </div>
                 )}
                 <div ref={scrollToRef}></div>
             </div>

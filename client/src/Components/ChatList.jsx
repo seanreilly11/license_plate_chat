@@ -1,17 +1,21 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ChatListItem from "./ChatListItem";
 import { userActions } from "../redux/actions/user.actions";
 import { authenticationActions } from "../redux/actions/authentication.actions";
 import { useAuth } from "../hooks/useAuth";
-import SearchBar from "./SearchBar";
 import Spinner from "./Spinner";
+import Search from "./Search";
+import SearchBar from "./SearchBar";
+import SearchListItem from "./SearchListItem";
 
 function ChatList() {
     const user = useSelector((state) => state.users.item);
+    const userSearch = useSelector((state) => state.users.items);
     const fetchedRef = useRef(false);
     const dispatch = useDispatch();
     const loggedInUser = useAuth();
+    const [searchActive, setSearchActive] = useState(false);
 
     useEffect(() => {
         if (fetchedRef.current) return;
@@ -29,14 +33,20 @@ function ChatList() {
                 <h1 className="mb-0">Messages</h1>
                 <button onClick={handleLogout}>Logout</button>
             </div>
-            <SearchBar />
-            {user?.conversations?.length > 0 ? (
-                user?.conversations?.map((convo) => {
-                    return <ChatListItem convo={convo} key={convo} />;
-                })
-            ) : (
-                <Spinner />
-            )}
+            <SearchBar setSearchActive={setSearchActive} />
+            <div>
+                {searchActive ? (
+                    userSearch?.map((user) => (
+                        <SearchListItem user={user} key={user._id} />
+                    ))
+                ) : user?.conversations?.length > 0 ? (
+                    user?.conversations?.map((convo) => (
+                        <ChatListItem convo={convo} key={convo._id} />
+                    ))
+                ) : (
+                    <Spinner />
+                )}
+            </div>
         </div>
     );
 }

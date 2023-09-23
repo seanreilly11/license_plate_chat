@@ -29,8 +29,8 @@ function ChatListItem({ convo }) {
 
     return (
         <NavLink to={"/chat/" + convo._id} className={"chat-list-item"}>
-            {userDetails.firstname + " " + userDetails.lastname} -{" "}
-            {userDetails.carDetails.plate}
+            {userDetails?.firstname + " " + userDetails?.lastname} -{" "}
+            {userDetails?.carDetails?.plate}
         </NavLink>
     );
 }

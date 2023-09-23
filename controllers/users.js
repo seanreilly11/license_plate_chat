@@ -61,15 +61,23 @@ exports.getUserByID = async (req, res) => {
         const user = await User.findById(req.params.id);
         const conversations = await Conversation.find({
             users: { $in: [req.params.id] },
-        });
-        let otherUserId;
+        }).sort({ updatedDate: -1 });
+        let otherUserIds = [];
         conversations.forEach((convos) => {
-            convos.users.forEach((_user) => {
-                if (_user != req.params.id) otherUserId = _user;
+            convos.users.forEach((_userId) => {
+                if (_userId != req.params.id)
+                    otherUserIds = [
+                        ...otherUserIds,
+                        new mongoose.Types.ObjectId(_userId),
+                    ];
             });
         });
-        let otherUser = await User.aggregate([
-            { $match: { _id: new mongoose.Types.ObjectId(otherUserId) } },
+        let otherUsers = await User.aggregate([
+            {
+                $match: {
+                    _id: { $in: otherUserIds },
+                },
+            },
             {
                 $lookup: {
                     from: "cars",
@@ -81,15 +89,17 @@ exports.getUserByID = async (req, res) => {
             { $unwind: "$carDetails" },
         ]);
         conversations.forEach((convo, i) => {
-            if (convo.users.includes(otherUserId)) {
-                const { firstname, lastname, carDetails } = {
-                    ...otherUser["0"],
-                };
-                conversations[i] = {
-                    ...conversations[i]._doc,
-                    userDetails: { firstname, lastname, carDetails },
-                };
-            }
+            otherUsers.forEach((user, j) => {
+                if (convo.users.includes(user._id)) {
+                    const { firstname, lastname, carDetails } = {
+                        ...otherUsers[j],
+                    };
+                    conversations[i] = {
+                        ...conversations[i]._doc,
+                        userDetails: { firstname, lastname, carDetails },
+                    };
+                }
+            });
         });
 
         if (!user) return res.status(404).json({ error: "No user found" });

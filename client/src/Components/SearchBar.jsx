@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { userActions } from "../redux/actions/user.actions";
 
-function SearchBar() {
+function SearchBar({ setSearchActive }) {
     const [search, setSearch] = useState("");
     const dispatch = useDispatch();
 
@@ -15,7 +15,9 @@ function SearchBar() {
             <form>
                 <input
                     type="text"
-                    className="form-control"
+                    onFocus={() => setSearchActive(true)}
+                    // onBlur={() => setSearchActive(false)}
+                    className="form-control ml-0"
                     placeholder="Search"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}

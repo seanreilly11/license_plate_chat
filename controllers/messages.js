@@ -44,7 +44,12 @@ exports.addMessage = async (req, res, next) => {
             {
                 _id: req.body.conversationId,
             },
-            { $push: { messages: message._id } }
+            {
+                $currentDate: {
+                    updatedDate: true,
+                },
+                $push: { messages: message._id },
+            }
         );
 
         return res.status(201).json(message);
