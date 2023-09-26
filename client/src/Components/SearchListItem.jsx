@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { makeConversationID } from "../utils/utils";
 import { useAuth } from "../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,7 +17,8 @@ function SearchListItem({ user }) {
         // to check search convoIds with the created convoId
         dispatch(
             conversationActions.findConversationId(
-                makeConversationID(userDetails._id, loggedInUser.id)
+                makeConversationID(userDetails._id, loggedInUser.id),
+                loggedInUser.id
             )
         );
     };

@@ -1,6 +1,8 @@
 const Conversation = require("../models/Conversation");
 const Message = require("../models/Message");
+const User = require("../models/User");
 const utils = require("./utils");
+const mongoose = require("mongoose");
 
 // @desc Get all conversation
 // @route GET /api/conversation
@@ -24,7 +26,9 @@ exports.getConversations = async (req, res, next) => {
 exports.getConversationByID = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { accessLevel } = req.query;
+        const { accessLevel, loggedInUserId } = req.query;
+        let userId;
+
         const filter =
             accessLevel == 1
                 ? { conversationId: id }
@@ -34,13 +38,32 @@ exports.getConversationByID = async (req, res, next) => {
         const messages = await Message.find(filter).sort({
             createdDate: 1,
         });
+        conversation.users.forEach((user) => {
+            if (user !== loggedInUserId) userId = user;
+        });
+        const userDetails = await User.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+            {
+                $lookup: {
+                    from: "cars",
+                    localField: "carId",
+                    foreignField: "_id",
+                    as: "carDetails",
+                },
+            },
+            { $unwind: "$carDetails" },
+        ]);
 
         if (!conversation)
             return res.status(404).json({
                 error: "No conversation found",
             });
 
-        return res.status(200).json({ ...conversation._doc, messages });
+        return res.status(200).json({
+            ...conversation._doc,
+            messages,
+            userDetails: userDetails[0],
+        });
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
@@ -75,13 +98,17 @@ exports.getConversationsByUser = async (req, res, next) => {
 exports.getConversationByConvoID = async (req, res, next) => {
     try {
         const { id } = req.params;
+        const { loggedInUserID } = req.query;
         const filter = { conversationId: id, status: utils.isActive() };
 
         const conversation = await Conversation.findOne(filter);
 
         if (conversation) return res.status(200).json(conversation);
 
-        return this.createConversation({ body: { conversationId: id } }, res);
+        return this.createConversation(
+            { body: { conversationId: id, loggedInUserID } },
+            res
+        );
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
@@ -91,7 +118,7 @@ exports.getConversationByConvoID = async (req, res, next) => {
 // @route POST /api/conversations
 exports.createConversation = async (req, res, next) => {
     try {
-        const { conversationId } = req.body;
+        const { conversationId, loggedInUserID } = req.body;
         const conversation = await Conversation.findOne({ conversationId });
 
         if (conversation)
@@ -101,6 +128,7 @@ exports.createConversation = async (req, res, next) => {
 
         const newConversation = new Conversation({
             conversationId,
+            initiatedUser: new mongoose.Types.ObjectId(loggedInUserID),
             users: conversationId.split("||"),
         });
         newConversation

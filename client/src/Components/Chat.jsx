@@ -7,6 +7,7 @@ import { conversationActions } from "../redux/actions/conversation.actions";
 import { useAuth } from "../hooks/useAuth";
 import { messageActions } from "../redux/actions/message.actions";
 import Spinner from "./Spinner";
+import RequestStatement from "./RequestStatement";
 const socket = socketIO.connect("http://localhost:4000", {
     autoConnect: false,
 });
@@ -16,20 +17,21 @@ function Chat() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const messagesReceived = useSelector((state) => state.messages.items);
+    const convo = useSelector((state) => state.conversations.item);
     const loading = useSelector((state) => state.messages.loading);
     const [messageText, setMessageText] = useState("");
     const joinedRef = useRef(false);
     const isFirstViewRef = useRef(true);
     const scrollToRef = useRef(null);
-    const user = useAuth();
+    const loggedInUser = useAuth();
 
     const handleJoin = (e) => {
         if (joinedRef.current) return;
 
-        socket.auth = { username: user.firstname };
+        socket.auth = { username: loggedInUser.firstname };
         socket.connect();
 
-        socket.emit("joinRoom", { username: user.firstname, room: id });
+        socket.emit("joinRoom", { username: loggedInUser.firstname, room: id });
         joinedRef.current = true;
     };
 
@@ -38,7 +40,7 @@ function Chat() {
         if (messageText) {
             const msg = {
                 text: messageText,
-                senderId: user.id,
+                senderId: loggedInUser.id,
                 conversationId: id,
             };
             socket.emit("chatMessage", msg);
@@ -54,7 +56,7 @@ function Chat() {
             dispatch(messageActions.newMessage(data));
         });
 
-        dispatch(conversationActions.getSingle(id));
+        dispatch(conversationActions.getSingle(id, loggedInUser.id));
         handleJoin();
 
         return () => {
@@ -74,14 +76,19 @@ function Chat() {
     return (
         <div>
             <header className="chat-header">
-                <button onClick={() => navigate(-1)}>{"<"}</button>Chat {id}
+                <button onClick={() => navigate(-1)}>{"<"}</button>
+                <h5 className="mb-0 ms-3">
+                    {convo?.userDetails?.firstname}{" "}
+                    {convo?.userDetails?.lastname} -{" "}
+                    {convo?.userDetails?.carDetails?.plate}
+                </h5>
             </header>
             <div className="message-list">
                 {messagesReceived?.map((msg, i) => (
                     <MessageItem
                         key={msg._id}
                         msg={msg}
-                        user={user}
+                        user={loggedInUser}
                         prev={messagesReceived[i - 1]?.createdDate}
                     />
                 ))}
@@ -93,6 +100,10 @@ function Chat() {
                         <Spinner />
                     </div>
                 )}
+                {convo?.status === 0 &&
+                    convo.initiatedUser !== loggedInUser.id && (
+                        <RequestStatement user={convo.userDetails} />
+                    )}
                 <div ref={scrollToRef}></div>
             </div>
             <form className="chat-form" onSubmit={handleSend}>

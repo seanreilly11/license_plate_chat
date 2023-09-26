@@ -39,12 +39,28 @@ function ChatList() {
                         <SearchListItem user={user} key={user._id} />
                     ))
                 ) : user?.conversations?.length > 0 ? (
-                    user?.conversations?.map((convo) => (
-                        <ChatListItem convo={convo} key={convo._id} />
-                    ))
+                    user?.conversations?.map(
+                        (convo) =>
+                            (convo.status === 1 ||
+                                convo.initiatedUser === loggedInUser.id) && (
+                                <ChatListItem convo={convo} key={convo._id} />
+                            )
+                    )
                 ) : (
                     <Spinner />
                 )}
+            </div>
+            <div>
+                <h2 className="m-2 mt-4">Requests</h2>
+                {!searchActive &&
+                    user?.conversations?.length > 0 &&
+                    user?.conversations?.map(
+                        (convo) =>
+                            convo.status === 0 &&
+                            convo.initiatedUser !== loggedInUser.id && (
+                                <ChatListItem convo={convo} key={convo._id} />
+                            )
+                    )}
             </div>
         </div>
     );

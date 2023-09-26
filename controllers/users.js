@@ -31,29 +31,6 @@ exports.getUsers = async (req, res) => {
     }
 };
 
-// @desc Get user by plate
-// @route GET /api/v1/users/plate/:plate
-exports.getUsersByPlate = async (req, res) => {
-    try {
-        const cars = await Car.aggregate([
-            { $match: { plate: { $regex: req.params.plate.toUpperCase() } } },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "_id",
-                    foreignField: "carId",
-                    as: "userDetails",
-                },
-            },
-            // { $project: { "userDetails.firstname": 1, lastname: 1, _id: 1 } },
-            { $unwind: "$userDetails" },
-        ]);
-        return res.status(200).json(cars);
-    } catch (err) {
-        return res.status(500).json({ error: err.message });
-    }
-};
-
 // @desc Get user by ID
 // @route GET /api/v1/users/:id
 exports.getUserByID = async (req, res) => {
@@ -91,12 +68,12 @@ exports.getUserByID = async (req, res) => {
         conversations.forEach((convo, i) => {
             otherUsers.forEach((user, j) => {
                 if (convo.users.includes(user._id)) {
-                    const { firstname, lastname, carDetails } = {
+                    const { firstname, lastname, carDetails, _id } = {
                         ...otherUsers[j],
                     };
                     conversations[i] = {
                         ...conversations[i]._doc,
-                        userDetails: { firstname, lastname, carDetails },
+                        userDetails: { firstname, lastname, carDetails, _id },
                     };
                 }
             });
@@ -110,6 +87,29 @@ exports.getUserByID = async (req, res) => {
             password: undefined,
             token: undefined,
         });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+};
+
+// @desc Get user by plate
+// @route GET /api/v1/users/plate/:plate
+exports.getUsersByPlate = async (req, res) => {
+    try {
+        const cars = await Car.aggregate([
+            { $match: { plate: { $regex: req.params.plate.toUpperCase() } } },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "carId",
+                    as: "userDetails",
+                },
+            },
+            // { $project: { "userDetails.firstname": 1, lastname: 1, _id: 1 } },
+            { $unwind: "$userDetails" },
+        ]);
+        return res.status(200).json(cars);
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }

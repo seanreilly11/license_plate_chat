@@ -34,11 +34,11 @@ function getAll() {
     }
 }
 
-function getSingle(id) {
+function getSingle(id, loggedInUserId) {
     return (dispatch) => {
         dispatch(request());
 
-        conversationService.getSingle(id).then(
+        conversationService.getSingle(id, loggedInUserId).then(
             (data) => dispatch(success(data)),
             (error) => {
                 dispatch(failure(error));
@@ -80,11 +80,11 @@ function getUserConversations(id) {
     }
 }
 
-function findConversationId(id) {
+function findConversationId(id, loggedInUserID) {
     return (dispatch) => {
         dispatch(request());
 
-        conversationService.findConversationId(id).then(
+        conversationService.findConversationId(id, loggedInUserID).then(
             (data) => dispatch(success(data)),
             (error) => {
                 dispatch(failure(error));

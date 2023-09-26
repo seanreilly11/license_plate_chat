@@ -16,7 +16,12 @@ const conversationSchema = new mongoose.Schema({
     },
     status: {
         type: Number,
-        default: 1,
+        default: 0,
+    },
+    initiatedUser: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
     },
     createdDate: {
         type: Date,
