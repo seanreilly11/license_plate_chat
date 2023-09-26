@@ -5,7 +5,6 @@ import { userActions } from "../redux/actions/user.actions";
 import { authenticationActions } from "../redux/actions/authentication.actions";
 import { useAuth } from "../hooks/useAuth";
 import Spinner from "./Spinner";
-import Search from "./Search";
 import SearchBar from "./SearchBar";
 import SearchListItem from "./SearchListItem";
 
