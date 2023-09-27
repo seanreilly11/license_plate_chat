@@ -66,7 +66,11 @@ function Chat() {
     }, [socket]);
 
     useEffect(() => {
-        if (isFirstViewRef.current && !loading && messagesReceived?.length) {
+        if (
+            isFirstViewRef.current &&
+            !loading &&
+            messagesReceived?.length > 0
+        ) {
             scrollToRef.current?.scrollIntoView({ behavior: "auto" });
             isFirstViewRef.current = false;
         }
