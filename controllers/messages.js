@@ -40,7 +40,7 @@ exports.getMessageByID = async (req, res, next) => {
 exports.addMessage = async (req, res, next) => {
     try {
         const message = await Message.create(req.body);
-        const conversation = await Conversation.updateOne(
+        const conversation = await Conversation.findOneAndUpdate(
             {
                 _id: req.body.conversationId,
             },
@@ -52,7 +52,40 @@ exports.addMessage = async (req, res, next) => {
             }
         );
 
+        if (
+            conversation.status === 0 &&
+            conversation.initiatedUser.toString() !== req.body.senderId
+        ) {
+            this.makeConversationAccepted(
+                {
+                    body: { conversationId: req.body.conversationId },
+                },
+                res
+            );
+        }
+
         return res.status(201).json(message);
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+};
+
+// @desc Is first response from other user in convo to make status 1
+exports.makeConversationAccepted = async (req, res, next) => {
+    try {
+        const conversation = await Conversation.findOneAndUpdate(
+            {
+                _id: req.body.conversationId,
+            },
+            {
+                $currentDate: {
+                    updatedDate: true,
+                },
+                $set: { status: 1 },
+            }
+        );
+
+        return res.status(201);
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
