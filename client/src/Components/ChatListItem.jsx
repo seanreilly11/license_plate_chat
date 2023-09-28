@@ -12,8 +12,13 @@ function ChatListItem({ convo }) {
 
     return (
         <NavLink to={"/chat/" + convo._id} className={"chat-list-item"}>
-            {userDetails?.firstname + " " + userDetails?.lastname} -{" "}
-            {userDetails?.carDetails?.plate} status: {convo.status}
+            <div className="d-flex align-items-center">
+                <h3 className="mb-0">{userDetails?.carDetails?.plate}</h3>
+                <h3 className=" mx-2">-</h3>
+                <h6 className="mb-0">
+                    {userDetails?.firstname + " " + userDetails?.lastname}
+                </h6>
+            </div>
             <div>{showTime(convo.updatedDate)}</div>
         </NavLink>
     );
