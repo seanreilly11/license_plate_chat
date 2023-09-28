@@ -23,5 +23,16 @@ function isThisYear(date) {
     return date.getFullYear() === today.getFullYear();
 }
 
+function getFormattedTime(time) {
+    let formattedTime = "";
+    if (isToday(time)) formattedTime = moment(time).format("h:mm a");
+    else if (isThisWeek(time))
+        formattedTime = moment(time).format("ddd h:mm a");
+    else if (isThisYear(time))
+        formattedTime = moment(time).format("DD MMM h:mm a");
+    else formattedTime = moment(time).format("DD MMM YYYY h:mm a");
+    return formattedTime;
+}
+
 // 4ncwe98rh48hc82chiqn
-export { makeConversationID, CONVO_GAP, isToday, isThisWeek, isThisYear };
+export { makeConversationID, CONVO_GAP, getFormattedTime };
