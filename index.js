@@ -31,6 +31,7 @@ const BOT_NAME = "Chat Bot";
 const messages = require("./routes/messages");
 const users = require("./routes/users");
 const conversations = require("./routes/conversations");
+const blocked = require("./routes/blocked");
 
 app.use((req, res, next) => {
     console.log(`${req.method} request for ${req.url}`);
@@ -40,6 +41,7 @@ app.use((req, res, next) => {
 app.use("/api/v1/conversations", conversations);
 app.use("/api/v1/users", users);
 app.use("/api/v1/messages", messages);
+app.use("/api/v1/blocked", blocked);
 
 // io.use((socket, next) => {
 //     const username = socket.handshake.auth.username;

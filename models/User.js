@@ -27,6 +27,10 @@ const userSchema = new mongoose.Schema({
         ref: "Car",
         required: true,
     },
+    blockedUsers: {
+        type: [String],
+        default: [],
+    },
     admin: {
         type: Boolean,
         default: false,
