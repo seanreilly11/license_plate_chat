@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import socketIO from "socket.io-client";
-import MessageItem from "./MessageItem";
 import { useDispatch, useSelector } from "react-redux";
+import MessageItem from "./MessageItem";
 import { conversationActions } from "../redux/actions/conversation.actions";
 import { useAuth } from "../hooks/useAuth";
 import { messageActions } from "../redux/actions/message.actions";

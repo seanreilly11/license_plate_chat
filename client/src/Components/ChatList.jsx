@@ -6,9 +6,11 @@ import { authenticationActions } from "../redux/actions/authentication.actions";
 import { useAuth } from "../hooks/useAuth";
 import Spinner from "./Spinner";
 import SearchBar from "./SearchBar";
+import NoConvos from "./NoConvos";
 
 function ChatList() {
     const user = useSelector((state) => state.users.item);
+    const loading = useSelector((state) => state.users.loading);
     const fetchedRef = useRef(false);
     const dispatch = useDispatch();
     const loggedInUser = useAuth();
@@ -33,30 +35,32 @@ function ChatList() {
             <SearchBar />
             <div>
                 {/* show active messages  */}
-                {user?.conversations?.length > 0 ? (
-                    user?.conversations?.map(
-                        (convo) =>
-                            (convo.status === 1 ||
-                                convo.initiatedUser === loggedInUser.id) &&
-                            convo.messages.length > 0 && (
-                                <ChatListItem convo={convo} key={convo._id} />
-                            )
-                    )
-                ) : (
-                    <Spinner />
+                {user?.conversations?.map(
+                    (convo) =>
+                        (convo.status === 1 ||
+                            convo.initiatedUser === loggedInUser.id) &&
+                        convo.messages.length > 0 && (
+                            <ChatListItem convo={convo} key={convo._id} />
+                        )
                 )}
+                {!loading && user?.conversations?.length < 1 && <NoConvos />}
+                {loading && <Spinner />}
             </div>
             <div>
-                <h2 className="m-2 mt-4">Requests</h2>
+                {/* only show requests header if there are requests  */}
+                {user?.conversations?.some(
+                    (convo) =>
+                        convo.status === 0 &&
+                        convo.initiatedUser !== loggedInUser.id
+                ) && <h2 className="m-2 mt-4">Requests</h2>}
                 {/* show message requests  */}
-                {user?.conversations?.length > 0 &&
-                    user?.conversations?.map(
-                        (convo) =>
-                            convo.status === 0 &&
-                            convo.initiatedUser !== loggedInUser.id && (
-                                <ChatListItem convo={convo} key={convo._id} />
-                            )
-                    )}
+                {user?.conversations?.map(
+                    (convo) =>
+                        convo.status === 0 &&
+                        convo.initiatedUser !== loggedInUser.id && (
+                            <ChatListItem convo={convo} key={convo._id} />
+                        )
+                )}
             </div>
         </div>
     );

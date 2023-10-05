@@ -18,8 +18,9 @@ function Login() {
         dispatch(authenticationActions.signIn(email, password));
 
     return (
-        <div className="container">
-            <form className="mt-5" onSubmit={handleSubmit(onSubmit)}>
+        <div className="container pt-3">
+            <h2>Login</h2>
+            <form className="mt-3" onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-2">
                     <label htmlFor="email" className="form-label">
                         Email

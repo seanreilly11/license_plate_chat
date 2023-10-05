@@ -93,3 +93,10 @@
     outline: none;
     color: #fff;
 }
+
+.request-statement {
+    margin-top: 1rem;
+    position: fixed;
+    bottom: 70px;
+    width: calc(100% - 2rem);
+}

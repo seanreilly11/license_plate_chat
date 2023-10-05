@@ -7,6 +7,7 @@ import ChatList from "./Components/ChatList";
 import Login from "./Components/Login";
 import PrivateRoute from "./Components/PrivateRoute";
 import { history } from "./hooks/useHistory";
+import Register from "./Components/Register";
 
 function App() {
     // const location = useLocation();
@@ -16,6 +17,7 @@ function App() {
     return (
         <Routes>
             <Route path="/" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route
                 path="/home"
                 element={
