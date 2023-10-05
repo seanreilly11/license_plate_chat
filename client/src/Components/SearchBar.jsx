@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { userActions } from "../redux/actions/user.actions";
+import SearchListItem from "./SearchListItem";
 
-function SearchBar({ setSearchActive }) {
+function SearchBar() {
     const [search, setSearch] = useState("");
+    const [searchActive, setSearchActive] = useState(false);
+    const userSearch = useSelector((state) => state.users.items);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -16,13 +19,19 @@ function SearchBar({ setSearchActive }) {
                 <input
                     type="text"
                     onFocus={() => setSearchActive(true)}
-                    // onBlur={() => setSearchActive(false)}
                     className="form-control ml-0"
                     placeholder="Search"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
             </form>
+            <div className="mb-3">
+                {searchActive && search !== ""
+                    ? userSearch?.map((user) => (
+                          <SearchListItem user={user} key={user._id} />
+                      ))
+                    : ""}
+            </div>
         </div>
     );
 }

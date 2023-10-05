@@ -97,9 +97,15 @@ function Chat() {
                     />
                 ))}
                 {!loading && messagesReceived?.length < 1 && (
-                    <div className="mt-3">No messages</div>
+                    <div className="mt-4 text-center">
+                        <h1>{convo?.userDetails?.carDetails?.plate}</h1>
+                        <p>
+                            {convo?.userDetails?.firstname}{" "}
+                            {convo?.userDetails?.lastname}
+                        </p>
+                    </div>
                 )}
-                {loading && (
+                {loading && isFirstViewRef.current && (
                     <div className="mt-3">
                         <Spinner />
                     </div>

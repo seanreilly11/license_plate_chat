@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ChatListItem from "./ChatListItem";
 import { userActions } from "../redux/actions/user.actions";
@@ -6,15 +6,12 @@ import { authenticationActions } from "../redux/actions/authentication.actions";
 import { useAuth } from "../hooks/useAuth";
 import Spinner from "./Spinner";
 import SearchBar from "./SearchBar";
-import SearchListItem from "./SearchListItem";
 
 function ChatList() {
     const user = useSelector((state) => state.users.item);
-    const userSearch = useSelector((state) => state.users.items);
     const fetchedRef = useRef(false);
     const dispatch = useDispatch();
     const loggedInUser = useAuth();
-    const [searchActive, setSearchActive] = useState(false);
 
     useEffect(() => {
         if (fetchedRef.current) return;
@@ -33,17 +30,15 @@ function ChatList() {
                 <p className="mb-0">{loggedInUser.firstname}</p>
                 <button onClick={handleLogout}>Logout</button>
             </div>
-            <SearchBar setSearchActive={setSearchActive} />
+            <SearchBar />
             <div>
-                {searchActive ? (
-                    userSearch?.map((user) => (
-                        <SearchListItem user={user} key={user._id} />
-                    ))
-                ) : user?.conversations?.length > 0 ? (
+                {/* show active messages  */}
+                {user?.conversations?.length > 0 ? (
                     user?.conversations?.map(
                         (convo) =>
                             (convo.status === 1 ||
-                                convo.initiatedUser === loggedInUser.id) && (
+                                convo.initiatedUser === loggedInUser.id) &&
+                            convo.messages.length > 0 && (
                                 <ChatListItem convo={convo} key={convo._id} />
                             )
                     )
@@ -53,8 +48,8 @@ function ChatList() {
             </div>
             <div>
                 <h2 className="m-2 mt-4">Requests</h2>
-                {!searchActive &&
-                    user?.conversations?.length > 0 &&
+                {/* show message requests  */}
+                {user?.conversations?.length > 0 &&
                     user?.conversations?.map(
                         (convo) =>
                             convo.status === 0 &&
