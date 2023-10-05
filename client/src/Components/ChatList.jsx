@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import ChatListItem from "./ChatListItem";
 import { userActions } from "../redux/actions/user.actions";
 import { authenticationActions } from "../redux/actions/authentication.actions";
 import { useAuth } from "../hooks/useAuth";
+import ChatListItem from "./ChatListItem";
 import Spinner from "./Spinner";
 import SearchBar from "./SearchBar";
 import NoConvos from "./NoConvos";
@@ -38,8 +38,7 @@ function ChatList() {
                 {user?.conversations?.map(
                     (convo) =>
                         (convo.status === 1 ||
-                            convo.initiatedUser === loggedInUser.id) &&
-                        convo.messages.length > 0 && (
+                            convo.initiatedUser === loggedInUser.id) && (
                             <ChatListItem convo={convo} key={convo._id} />
                         )
                 )}

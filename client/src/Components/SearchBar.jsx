@@ -2,15 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { userActions } from "../redux/actions/user.actions";
 import SearchListItem from "./SearchListItem";
+import { useAuth } from "../hooks/useAuth";
 
 function SearchBar() {
     const [search, setSearch] = useState("");
     const [searchActive, setSearchActive] = useState(false);
     const userSearch = useSelector((state) => state.users.items);
     const dispatch = useDispatch();
+    const loggedInUser = useAuth();
 
     useEffect(() => {
-        search && dispatch(userActions.getPlateUsers(search));
+        search &&
+            dispatch(userActions.getPlateUsers(search, loggedInUser.plate));
     }, [search]);
 
     return (

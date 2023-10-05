@@ -13,7 +13,6 @@ const { JWT_TOKEN } = require("../config/keys");
 // @route GET /api/v1/users
 exports.getUsers = async (req, res) => {
     try {
-        // const users = await User.find().sort({ lastLogin: -1 });
         const users = await User.aggregate([
             {
                 $lookup: {
@@ -36,9 +35,13 @@ exports.getUsers = async (req, res) => {
 exports.getUserByID = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ error: "No user found" });
+
         const conversations = await Conversation.find({
             users: { $in: [req.params.id] },
+            messages: { $exists: true, $ne: [] },
         }).sort({ updatedDate: -1 });
+
         let otherUserIds = [];
         conversations.forEach((convos) => {
             convos.users.forEach((_userId) => {
@@ -79,8 +82,6 @@ exports.getUserByID = async (req, res) => {
             });
         });
 
-        if (!user) return res.status(404).json({ error: "No user found" });
-
         return res.status(200).json({
             ...user._doc,
             conversations,
@@ -92,12 +93,20 @@ exports.getUserByID = async (req, res) => {
     }
 };
 
-// @desc Get user by plate
-// @route GET /api/v1/users/plate/:plate
+// @desc Get users by plate
+// @route GET /api/v1/users/plate/:plate?loggedInUser
 exports.getUsersByPlate = async (req, res) => {
     try {
+        const { loggedInUser } = req.query;
         const cars = await Car.aggregate([
-            { $match: { plate: { $regex: req.params.plate.toUpperCase() } } },
+            {
+                $match: {
+                    plate: {
+                        $regex: req.params.plate.toUpperCase(),
+                        $ne: loggedInUser.toUpperCase(),
+                    },
+                },
+            },
             {
                 $lookup: {
                     from: "users",
@@ -106,7 +115,6 @@ exports.getUsersByPlate = async (req, res) => {
                     as: "userDetails",
                 },
             },
-            // { $project: { "userDetails.firstname": 1, lastname: 1, _id: 1 } },
             { $unwind: "$userDetails" },
         ]);
         return res.status(200).json(cars);
@@ -117,36 +125,36 @@ exports.getUsersByPlate = async (req, res) => {
 
 // @desc login user
 // @route POST /api/v1/users/login
-exports.loginUser = async (req, res, next) => {
+exports.loginUser = async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
         if (!user) return res.status(404).json({ error: "Email is not valid" });
 
-        if (bcryptjs.compareSync(req.body.password, user.password)) {
-            const updateUser = await User.updateOne(
-                {
-                    _id: user._id,
-                },
-                {
-                    $currentDate: {
-                        updatedDate: true,
-                        lastLogin: true,
-                    },
-                    $set: { token: generateToken(user) },
-                }
-            );
-            const userWithToken = await User.findById(user._id);
-            return res.status(200).json({
-                id: userWithToken._id,
-                firstname: userWithToken.firstname,
-                token: userWithToken.token,
-            });
-            // return res.status(200).json({ ...userWithToken._doc, password: undefined });
-        } else {
+        if (!bcryptjs.compareSync(req.body.password, user.password))
             return res.status(401).json({
                 error: "Incorrect password",
             });
-        }
+
+        const updatedUser = await User.findOneAndUpdate(
+            {
+                _id: user._id,
+            },
+            {
+                $currentDate: {
+                    updatedDate: true,
+                    lastLogin: true,
+                },
+                $set: { token: generateToken(user) },
+            }
+        );
+        const car = await Car.findById(updatedUser.carId);
+        return res.status(200).json({
+            id: updatedUser._id,
+            firstname: updatedUser.firstname,
+            token: updatedUser.token,
+            plate: car.plate,
+        });
+        // return res.status(200).json({ ...userWithToken._doc, password: undefined });
     } catch (err) {
         return res.status(500).json({
             error: err.message,
@@ -156,7 +164,7 @@ exports.loginUser = async (req, res, next) => {
 
 // @desc logout user
 // @route POST /api/v1/users/logout
-exports.logoutUser = async (req, res, next) => {
+exports.logoutUser = async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.body.userId });
         if (!user) return res.status(404).json({ error: "User not found" });
@@ -182,7 +190,7 @@ exports.logoutUser = async (req, res, next) => {
 
 // @desc login user on console
 // @route POST /api/v1/users/adminlogin
-exports.loginAdminUser = async (req, res, next) => {
+exports.loginAdminUser = async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
         if (!user) return res.status(404).json({ error: "User not found" });
@@ -409,7 +417,7 @@ exports.makeUserAdmin = async (req, res, next) => {
         if (!userCheck)
             return res.status(404).json({ error: "User not found" });
 
-        const user = await User.updateOne(
+        const user = await User.findOneAndUpdate(
             {
                 _id: userId,
             },
@@ -437,7 +445,7 @@ exports.updateUser = async (req, res, next) => {
         if (!userCheck)
             return res.status(404).json({ error: "User not found" });
 
-        const user = await User.updateOne(
+        const user = await User.findOneAndUpdate(
             {
                 _id: id,
             },
