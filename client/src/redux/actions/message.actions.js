@@ -1,14 +1,11 @@
 import { messageConstants } from "../constants/message.constants";
 import { messageService } from "../services/message.services";
-import { conversationActions } from "./conversation.actions";
-import { userActions } from "./user.actions";
 
 export const messageActions = {
     getAll,
     getSingle,
     newMessage,
     viewMessage,
-    completeMessage,
 };
 
 function getAll() {
@@ -100,31 +97,5 @@ function viewMessage(id) {
     }
     function failure(error) {
         return { type: messageConstants.VIEWVIDEO_FAILURE, error };
-    }
-}
-
-function completeMessage(messageId, userId) {
-    return (dispatch) => {
-        dispatch(request());
-
-        messageService.completeMessage(messageId, userId).then(
-            (data) => {
-                dispatch(success(data));
-                dispatch(userActions.getCompletedItems(userId));
-            },
-            (error) => {
-                dispatch(failure(error));
-            }
-        );
-    };
-
-    function request() {
-        return { type: messageConstants.COMPLETEMESSAGE_REQUEST };
-    }
-    function success(data) {
-        return { type: messageConstants.COMPLETEMESSAGE_SUCCESS, data };
-    }
-    function failure(error) {
-        return { type: messageConstants.COMPLETEMESSAGE_FAILURE, error };
     }
 }

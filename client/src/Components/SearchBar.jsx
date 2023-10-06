@@ -9,11 +9,9 @@ function SearchBar() {
     const [searchActive, setSearchActive] = useState(false);
     const userSearch = useSelector((state) => state.users.items);
     const dispatch = useDispatch();
-    const loggedInUser = useAuth();
 
     useEffect(() => {
-        search &&
-            dispatch(userActions.getPlateUsers(search, loggedInUser.plate));
+        search && dispatch(userActions.getPlateUsers(search));
     }, [search]);
 
     return (

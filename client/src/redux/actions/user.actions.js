@@ -57,11 +57,11 @@ function getAll() {
     }
 }
 
-function getPlateUsers(search, loggedIn) {
+function getPlateUsers(search) {
     return (dispatch) => {
         dispatch(request());
 
-        userService.getPlateUsers(search, loggedIn).then(
+        userService.getPlateUsers(search).then(
             (data) => dispatch(success(data)),
             (error) => {
                 dispatch(failure(error));

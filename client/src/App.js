@@ -8,11 +8,17 @@ import Login from "./Components/Login";
 import PrivateRoute from "./Components/PrivateRoute";
 import { history } from "./hooks/useHistory";
 import Register from "./Components/Register";
+import { useAuth } from "./hooks/useAuth";
+import { auth } from "./hooks/useAuthConst";
 
 function App() {
     // const location = useLocation();
     history.navigate = useNavigate();
     history.location = useLocation();
+    const user = useAuth();
+    auth.id = user?.id;
+    auth.token = user?.token;
+    auth.name = user?.firstname;
 
     return (
         <Routes>

@@ -26,23 +26,22 @@ exports.getConversations = async (req, res, next) => {
 exports.getConversationByID = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { accessLevel, loggedInUserId } = req.query;
-        let userId;
+        const { userId } = req.user;
+        let otherUserId;
 
-        const filter =
-            accessLevel == 1
-                ? { conversationId: id }
-                : { conversationId: id, status: utils.isActive() };
-
+        // get conversation details
         const conversation = await Conversation.findById(id);
-        const messages = await Message.find(filter).sort({
+        // get messages for that conversation
+        const messages = await Message.find({ conversationId: id }).sort({
             createdDate: 1,
         });
+        // find the other user in the conversation
         conversation.users.forEach((user) => {
-            if (user !== loggedInUserId) userId = user;
+            if (user !== userId) otherUserId = user;
         });
+        // get the other users details
         const userDetails = await User.aggregate([
-            { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+            { $match: { _id: new mongoose.Types.ObjectId(otherUserId) } },
             {
                 $lookup: {
                     from: "cars",
@@ -59,6 +58,7 @@ exports.getConversationByID = async (req, res, next) => {
                 error: "No conversation found",
             });
 
+        // return the conversation details with the messages and user details
         return res.status(200).json({
             ...conversation._doc,
             messages,

@@ -6,7 +6,6 @@ export const messageService = {
     getSingle,
     newMessage,
     viewMessage,
-    completeMessage,
 };
 
 function handleResponse(response) {
@@ -66,16 +65,4 @@ async function viewMessage(id) {
     return fetch(`${config.env}/messages/view/${id}`, requestOptions).then(
         handleResponse
     );
-}
-
-async function completeMessage(messageId, userId) {
-    const requestOptions = {
-        method: "PATCH",
-        headers: authHeader(),
-    };
-
-    return fetch(
-        `${config.env}/messages/complete?videoId=${messageId}&userId=${userId}`,
-        requestOptions
-    ).then(handleResponse);
 }

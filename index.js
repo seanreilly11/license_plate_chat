@@ -10,6 +10,7 @@ const {
     getRoomUsers,
 } = require("./utils/users");
 const connectDB = require("./config/db");
+const verifyToken = require("./middlewares/auth");
 const app = express();
 
 connectDB();
@@ -37,6 +38,9 @@ app.use((req, res, next) => {
     console.log(`${req.method} request for ${req.url}`);
     next();
 });
+
+// verify jwt
+app.use(verifyToken);
 
 app.use("/api/v1/conversations", conversations);
 app.use("/api/v1/users", users);

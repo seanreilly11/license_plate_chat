@@ -48,16 +48,15 @@ async function getAll() {
     return fetch(`${config.env}/users`, requestOptions).then(handleResponse);
 }
 
-async function getPlateUsers(search, loggedIn) {
+async function getPlateUsers(search) {
     const requestOptions = {
         method: "GET",
         headers: authHeader(),
     };
 
-    return fetch(
-        `${config.env}/users/plate/${search}?loggedInUser=${loggedIn}`,
-        requestOptions
-    ).then(handleResponse);
+    return fetch(`${config.env}/users/plate/${search}`, requestOptions).then(
+        handleResponse
+    );
 }
 
 async function getUserStats(id) {

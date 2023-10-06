@@ -34,11 +34,11 @@ function getAll() {
     }
 }
 
-function getSingle(id, loggedInUserId) {
+function getSingle(id) {
     return (dispatch) => {
         dispatch(request());
 
-        conversationService.getSingle(id, loggedInUserId).then(
+        conversationService.getSingle(id).then(
             (data) => dispatch(success(data)),
             (error) => {
                 dispatch(failure(error));

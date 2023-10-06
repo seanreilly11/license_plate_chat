@@ -56,7 +56,7 @@ function Chat() {
             dispatch(messageActions.newMessage(data));
         });
 
-        dispatch(conversationActions.getSingle(id, loggedInUser.id));
+        dispatch(conversationActions.getSingle(id));
         handleJoin();
 
         return () => {

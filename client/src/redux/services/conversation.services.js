@@ -37,16 +37,15 @@ async function getAll() {
     );
 }
 
-async function getSingle(id, loggedInUserId) {
+async function getSingle(id) {
     const requestOptions = {
         method: "GET",
         headers: authHeader(),
     };
 
-    return fetch(
-        `${config.env}/conversations/${id}?loggedInUserId=${loggedInUserId}`,
-        requestOptions
-    ).then(handleResponse);
+    return fetch(`${config.env}/conversations/${id}`, requestOptions).then(
+        handleResponse
+    );
 }
 
 async function getUserConversations(id) {

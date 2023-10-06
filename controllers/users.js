@@ -34,6 +34,7 @@ exports.getUsers = async (req, res) => {
 // @route GET /api/v1/users/:id
 exports.getUserByID = async (req, res) => {
     try {
+        console.log(req.user);
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ error: "No user found" });
 
@@ -94,16 +95,16 @@ exports.getUserByID = async (req, res) => {
 };
 
 // @desc Get users by plate
-// @route GET /api/v1/users/plate/:plate?loggedInUser
+// @route GET /api/v1/users/plate/:plate
 exports.getUsersByPlate = async (req, res) => {
     try {
-        const { loggedInUser } = req.query;
+        const { plate } = req.user;
         const cars = await Car.aggregate([
             {
                 $match: {
                     plate: {
                         $regex: req.params.plate.toUpperCase(),
-                        $ne: loggedInUser.toUpperCase(),
+                        $ne: plate.toUpperCase(),
                     },
                 },
             },
@@ -130,12 +131,15 @@ exports.loginUser = async (req, res) => {
         const user = await User.findOne({ email: req.body.email });
         if (!user) return res.status(404).json({ error: "Email is not valid" });
 
+        const car = await Car.findById(user.carId);
+
         if (!bcryptjs.compareSync(req.body.password, user.password))
             return res.status(401).json({
                 error: "Incorrect password",
             });
 
-        const updatedUser = await User.findOneAndUpdate(
+        const token = generateToken(user, car.plate);
+        const updatedUser = await User.updateOne(
             {
                 _id: user._id,
             },
@@ -144,14 +148,14 @@ exports.loginUser = async (req, res) => {
                     updatedDate: true,
                     lastLogin: true,
                 },
-                $set: { token: generateToken(user) },
+                $set: { token },
             }
         );
-        const car = await Car.findById(updatedUser.carId);
+
         return res.status(200).json({
-            id: updatedUser._id,
-            firstname: updatedUser.firstname,
-            token: updatedUser.token,
+            id: user._id,
+            firstname: user.firstname,
+            token,
             plate: car.plate,
         });
         // return res.status(200).json({ ...userWithToken._doc, password: undefined });
@@ -215,7 +219,7 @@ exports.loginAdminUser = async (req, res) => {
             );
             return res.status(200).json({
                 id: user._id,
-                token: token,
+                token,
                 firstname: user.firstname,
             });
         } else
@@ -480,7 +484,7 @@ exports.getUsersCompletedItems = async (req, res, next) => {
     }
 };
 
-function generateToken(user) {
+function generateToken(user, plate) {
     // var length = isAdmin ? 8 : 16,
     //     charset =
     //         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
@@ -488,7 +492,7 @@ function generateToken(user) {
     // for (var i = 0, n = charset.length; i < length; ++i)
     //     retVal += charset.charAt(Math.floor(Math.random() * n));
     const token = jwt.sign(
-        { user_id: user._id, email: user.email },
+        { userId: user._id, email: user.email, plate },
         JWT_TOKEN,
         {
             expiresIn: "24h",
