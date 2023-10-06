@@ -22,6 +22,7 @@ function Chat() {
     const [messageText, setMessageText] = useState("");
     const joinedRef = useRef(false);
     const isFirstViewRef = useRef(true);
+    const fetchedRef = useRef(false);
     const scrollToRef = useRef(null);
     const loggedInUser = useAuth();
 
@@ -56,7 +57,10 @@ function Chat() {
             dispatch(messageActions.newMessage(data));
         });
 
-        dispatch(conversationActions.getSingle(id));
+        if (!fetchedRef.current) {
+            dispatch(conversationActions.getSingle(id));
+            fetchedRef.current = true;
+        }
         handleJoin();
 
         return () => {
@@ -122,6 +126,7 @@ function Chat() {
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                     autoComplete="off"
+                    placeholder="Aa"
                 />
                 <input type="submit" value="Send" />
             </form>

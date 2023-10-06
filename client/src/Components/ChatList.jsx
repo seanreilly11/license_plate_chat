@@ -27,7 +27,7 @@ function ChatList() {
 
     return (
         <div>
-            <div className="d-flex justify-content-between align-items-center p-2">
+            <div className="d-flex justify-content-between align-items-center container my-3">
                 <h1 className="mb-0">Messages</h1>
                 <p className="mb-0">{loggedInUser.firstname}</p>
                 <button onClick={handleLogout}>Logout</button>

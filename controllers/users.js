@@ -34,25 +34,39 @@ exports.getUsers = async (req, res) => {
 // @route GET /api/v1/users/:id
 exports.getUserByID = async (req, res) => {
     try {
-        console.log(req.user);
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ error: "No user found" });
 
+        // get conversations that have messages
         const conversations = await Conversation.find({
             users: { $in: [req.params.id] },
             messages: { $exists: true, $ne: [] },
         }).sort({ updatedDate: -1 });
 
+        // get last message sent details
+        let messageIds = [];
+        conversations.forEach(
+            (convo) =>
+                (messageIds = [
+                    ...messageIds,
+                    convo.messages[convo.messages.length - 1],
+                ])
+        );
+        const lastMessages = await Message.find({
+            _id: { $in: messageIds },
+        });
+
+        // get array of all other conversation users
         let otherUserIds = [];
         conversations.forEach((convos) => {
-            convos.users.forEach((_userId) => {
-                if (_userId != req.params.id)
-                    otherUserIds = [
-                        ...otherUserIds,
-                        new mongoose.Types.ObjectId(_userId),
-                    ];
-            });
+            otherUserIds = [
+                ...otherUserIds,
+                new mongoose.Types.ObjectId(
+                    convos.users.filter((user) => user != req.params.id)[0]
+                ),
+            ];
         });
+        // get other users details
         let otherUsers = await User.aggregate([
             {
                 $match: {
@@ -70,6 +84,7 @@ exports.getUserByID = async (req, res) => {
             { $unwind: "$carDetails" },
         ]);
         conversations.forEach((convo, i) => {
+            // add user details to correct conversation
             otherUsers.forEach((user, j) => {
                 if (convo.users.includes(user._id)) {
                     const { firstname, lastname, carDetails, _id } = {
@@ -80,6 +95,17 @@ exports.getUserByID = async (req, res) => {
                         userDetails: { firstname, lastname, carDetails, _id },
                     };
                 }
+            });
+            // add last message sent text to convo
+            lastMessages.forEach((msg) => {
+                if (
+                    convo.messages[convo.messages.length - 1].toString() ==
+                    msg._id
+                )
+                    conversations[i] = {
+                        ...conversations[i],
+                        lastMessageText: msg.text,
+                    };
             });
         });
 
@@ -116,8 +142,18 @@ exports.getUsersByPlate = async (req, res) => {
                     as: "userDetails",
                 },
             },
+            {
+                $project: {
+                    _id: 1,
+                    plate: 1,
+                    "userDetails._id": 1,
+                    "userDetails.firstname": 1,
+                    "userDetails.lastname": 1,
+                },
+            },
             { $unwind: "$userDetails" },
-        ]);
+            { $limit: 10 },
+        ]).sort({ plate: 1 });
         return res.status(200).json(cars);
     } catch (err) {
         return res.status(500).json({ error: err.message });

@@ -19,7 +19,10 @@ function ChatListItem({ convo }) {
                     {userDetails?.firstname + " " + userDetails?.lastname}
                 </h6>
             </div>
-            <div>{showTime(convo.updatedDate)}</div>
+            <div className="d-flex justify-content-between align-items-center">
+                <span>{convo.lastMessageText}</span>
+                <span>{showTime(convo.updatedDate)}</span>
+            </div>
         </NavLink>
     );
 }

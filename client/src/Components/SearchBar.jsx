@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { userActions } from "../redux/actions/user.actions";
 import SearchListItem from "./SearchListItem";
-import { useAuth } from "../hooks/useAuth";
 
 function SearchBar() {
     const [search, setSearch] = useState("");
@@ -15,24 +14,28 @@ function SearchBar() {
     }, [search]);
 
     return (
-        <div className="container mb-3">
-            <form>
+        <div className="my-3">
+            <div className="container">
                 <input
                     type="text"
                     onFocus={() => setSearchActive(true)}
-                    className="form-control ml-0"
+                    className="form-control ms-0"
                     placeholder="Search"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
-            </form>
-            <div className="mb-3">
-                {searchActive && search !== ""
-                    ? userSearch?.map((user) => (
-                          <SearchListItem user={user} key={user._id} />
-                      ))
-                    : ""}
             </div>
+            {searchActive && search !== "" && (
+                <div className="search-list-container">
+                    <div className="container mb-3">
+                        {searchActive && search !== ""
+                            ? userSearch?.map((user) => (
+                                  <SearchListItem user={user} key={user._id} />
+                              ))
+                            : ""}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
