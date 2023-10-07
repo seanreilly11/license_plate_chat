@@ -49,6 +49,7 @@ exports.addMessage = async (req, res, next) => {
                     updatedDate: true,
                 },
                 $push: { messages: message._id },
+                $set: { seenBy: [req.user.userId] },
             }
         );
 

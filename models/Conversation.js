@@ -14,6 +14,10 @@ const conversationSchema = new mongoose.Schema({
         type: [String],
         default: [],
     },
+    seenBy: {
+        type: [String],
+        default: [],
+    },
     status: {
         type: Number,
         default: 0,

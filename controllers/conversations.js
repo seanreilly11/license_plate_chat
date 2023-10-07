@@ -30,7 +30,12 @@ exports.getConversationByID = async (req, res, next) => {
         let otherUserId;
 
         // get conversation details
-        const conversation = await Conversation.findById(id);
+        const conversation = await Conversation.findOneAndUpdate(
+            { _id: id },
+            {
+                $addToSet: { seenBy: req.user.userId },
+            }
+        );
         // get messages for that conversation
         const messages = await Message.find({ conversationId: id }).sort({
             createdDate: 1,
