@@ -6,6 +6,7 @@ export const userService = {
     getSingle,
     getAll,
     getPlateUsers,
+    blockUser,
     getUserStats,
     getCompletedItems,
 };
@@ -57,6 +58,17 @@ async function getPlateUsers(search) {
     return fetch(`${config.env}/users/plate/${search}`, requestOptions).then(
         handleResponse
     );
+}
+
+async function blockUser(obj) {
+    const requestOptions = {
+        method: "POST",
+        headers: authHeader(),
+        dataType: "json",
+        body: JSON.stringify(obj),
+    };
+
+    return fetch(`${config.env}/blocked`, requestOptions).then(handleResponse);
 }
 
 async function getUserStats(id) {

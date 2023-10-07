@@ -5,6 +5,7 @@ const initialState = {
     items: [],
     error: null,
     item: null,
+    blockedUsers: [],
     completed: null,
     stats: null,
 };
@@ -76,6 +77,26 @@ export function users(state = initialState, action) {
                 error: action.error,
                 loading: false,
                 items: [],
+            };
+        //
+        // BLOCK A USER
+        //
+        case userConstants.BLOCKUSER_REQUEST:
+            return {
+                ...state,
+                loading: true,
+            };
+        case userConstants.BLOCKUSER_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                blockedUsers: [...state.blockedUsers, action.data],
+            };
+        case userConstants.BLOCKUSER_FAILURE:
+            return {
+                error: action.error,
+                loading: false,
+                blockedUsers: [],
             };
         //
         // GET USER STATS

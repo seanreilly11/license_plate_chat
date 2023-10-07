@@ -7,6 +7,7 @@ export const userActions = {
     getSingle,
     getAll,
     getPlateUsers,
+    blockUser,
     getUserStats,
     getCompletedItems,
 };
@@ -77,6 +78,29 @@ function getPlateUsers(search) {
     }
     function failure(error) {
         return { type: userConstants.GETPLATEUSERS_FAILURE, error };
+    }
+}
+
+function blockUser(obj) {
+    return (dispatch) => {
+        dispatch(request());
+
+        userService.blockUser(obj).then(
+            (data) => dispatch(success(data)),
+            (error) => {
+                dispatch(failure(error));
+            }
+        );
+    };
+
+    function request() {
+        return { type: userConstants.BLOCKUSER_REQUEST };
+    }
+    function success(data) {
+        return { type: userConstants.BLOCKUSER_SUCCESS, data };
+    }
+    function failure(error) {
+        return { type: userConstants.BLOCKUSER_FAILURE, error };
     }
 }
 

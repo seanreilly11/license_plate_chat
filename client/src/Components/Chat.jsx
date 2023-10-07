@@ -19,6 +19,10 @@ function Chat() {
     const messagesReceived = useSelector((state) => state.messages.items);
     const convo = useSelector((state) => state.conversations.item);
     const loading = useSelector((state) => state.messages.loading);
+    const blockedUsers = useSelector((state) => state.users.blockedUsers);
+    const userIsBlocked = blockedUsers.some(
+        (user) => user.blockeeId === convo?.userDetails._id
+    );
     const [messageText, setMessageText] = useState("");
     const joinedRef = useRef(false);
     const isFirstViewRef = useRef(true);
@@ -92,14 +96,13 @@ function Chat() {
                 </h5>
             </header>
             <div className="message-list">
-                {messagesReceived?.map((msg, i) => (
-                    <MessageItem
-                        key={msg._id}
-                        msg={msg}
-                        user={loggedInUser}
-                        prev={messagesReceived[i - 1]?.createdDate}
-                    />
-                ))}
+                {/* loading  */}
+                {loading && isFirstViewRef.current && (
+                    <div className="mt-3">
+                        <Spinner />
+                    </div>
+                )}
+                {/* no messages so show user details  */}
                 {!loading && messagesReceived?.length < 1 && (
                     <div className="mt-4 text-center">
                         <h1>{convo?.userDetails?.carDetails?.plate}</h1>
@@ -109,14 +112,29 @@ function Chat() {
                         </p>
                     </div>
                 )}
-                {loading && isFirstViewRef.current && (
-                    <div className="mt-3">
-                        <Spinner />
-                    </div>
-                )}
+                {/* list messages  */}
+                {messagesReceived?.map((msg, i) => (
+                    <MessageItem
+                        key={msg._id}
+                        msg={msg}
+                        user={loggedInUser}
+                        prev={messagesReceived[i - 1]?.createdDate}
+                    />
+                ))}
+                {/* show message request pop up  */}
                 {convo?.status === 0 &&
                     convo.initiatedUser !== loggedInUser.id && (
-                        <RequestStatement user={convo.userDetails} />
+                        <RequestStatement
+                            user={convo.userDetails}
+                            blocked={userIsBlocked}
+                        />
+                    )}
+                {/* show if seen  */}
+                {messagesReceived?.length > 0 &&
+                    messagesReceived[messagesReceived?.length - 1]?.senderId ===
+                        loggedInUser?.id &&
+                    convo?.seenBy.length === 2 && (
+                        <span className="align-self-end">Seen</span>
                     )}
                 <div ref={scrollToRef}></div>
             </div>

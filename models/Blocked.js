@@ -14,7 +14,6 @@ const blockedSchema = new mongoose.Schema({
     },
     reason: {
         type: Number,
-        required: true,
     },
     status: {
         type: Number,

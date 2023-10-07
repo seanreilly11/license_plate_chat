@@ -20,7 +20,7 @@ exports.getAllBlocked = async (req, res) => {
 // @route POST /api/conversations
 exports.createBlocked = async (req, res, next) => {
     try {
-        const { blockerId, blockeeId, reason } = req.body;
+        const { blockerId, blockeeId } = req.body;
         const blocked = await Blocked.findOne({ blockeeId, blockerId });
 
         if (blocked)
@@ -28,11 +28,7 @@ exports.createBlocked = async (req, res, next) => {
                 error: "User already blocked",
             });
 
-        const newBlocked = new Blocked({
-            blockerId,
-            blockeeId,
-            reason,
-        });
+        const newBlocked = new Blocked(req.body);
         const user = await User.findOneAndUpdate(
             {
                 _id: blockerId,
@@ -42,6 +38,14 @@ exports.createBlocked = async (req, res, next) => {
                     updatedDate: true,
                 },
                 $push: { blockedUsers: blockeeId },
+            }
+        );
+        const conversation = await Conversation.findOneAndUpdate(
+            {
+                users: { $in: [blockerId, blockeeId] },
+            },
+            {
+                $set: { status: 3 },
             }
         );
         newBlocked
