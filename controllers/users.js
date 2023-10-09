@@ -6,6 +6,7 @@ const User = require("../models/User");
 const Car = require("../models/Car");
 const Conversation = require("../models/Conversation");
 const Message = require("../models/Message");
+const Blocked = require("../models/Blocked");
 const { JWT_TOKEN } = require("../config/keys");
 // const auth = require("../middlewares/auth");
 
@@ -41,6 +42,7 @@ exports.getUserByID = async (req, res) => {
         const conversations = await Conversation.find({
             users: { $in: [req.params.id] },
             messages: { $exists: true, $ne: [] },
+            status: { $gte: 0, $lt: 2 },
         }).sort({ updatedDate: -1 });
 
         // get last message sent details
@@ -125,11 +127,14 @@ exports.getUserByID = async (req, res) => {
 exports.getUsersByPlate = async (req, res) => {
     try {
         const { plate } = req.user;
+        // get cars by plate and aggregate the user details with it
         const cars = await Car.aggregate([
             {
                 $match: {
                     plate: {
+                        // contains searched plate
                         $regex: req.params.plate.toUpperCase(),
+                        // isn't users plate
                         $ne: plate.toUpperCase(),
                     },
                 },
@@ -154,6 +159,23 @@ exports.getUsersByPlate = async (req, res) => {
             { $unwind: "$userDetails" },
             { $limit: 10 },
         ]).sort({ plate: 1 });
+        // array of user ID strings
+        const userIds = cars.map((car) => car.userDetails._id.toString());
+        const blocked = await Blocked.find({
+            $and: [
+                { users: { $in: userIds } },
+                { users: { $in: [req.user.userId] } },
+            ],
+        });
+        cars.forEach((car, i) => {
+            if (
+                blocked.find((block) =>
+                    block.users.includes(car.userDetails._id.toString())
+                )
+            )
+                cars.splice(i, 1);
+        });
+
         return res.status(200).json(cars);
     } catch (err) {
         return res.status(500).json({ error: err.message });

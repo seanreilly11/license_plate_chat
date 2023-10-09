@@ -20,7 +20,7 @@ function Chat() {
     const convo = useSelector((state) => state.conversations.item);
     const loading = useSelector((state) => state.messages.loading);
     const blockedUsers = useSelector((state) => state.users.blockedUsers);
-    const userIsBlocked = blockedUsers.some(
+    const userIsBlocked = blockedUsers?.some(
         (user) => user.blockeeId === convo?.userDetails._id
     );
     const [messageText, setMessageText] = useState("");

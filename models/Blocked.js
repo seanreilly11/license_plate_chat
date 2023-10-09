@@ -2,14 +2,18 @@ const mongoose = require("mongoose");
 const User = require("./User");
 
 const blockedSchema = new mongoose.Schema({
-    blockerId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
-    blockeeId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+    // blockerId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "User",
+    //     required: true,
+    // },
+    // blockeeId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "User",
+    //     required: true,
+    // },
+    users: {
+        type: [String],
         required: true,
     },
     reason: {

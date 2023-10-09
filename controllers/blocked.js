@@ -21,14 +21,16 @@ exports.getAllBlocked = async (req, res) => {
 exports.createBlocked = async (req, res, next) => {
     try {
         const { blockerId, blockeeId } = req.body;
-        const blocked = await Blocked.findOne({ blockeeId, blockerId });
+        const blocked = await Blocked.findOne({
+            users: [blockerId, blockeeId],
+        });
 
         if (blocked)
             return res.status(409).json({
                 error: "User already blocked",
             });
 
-        const newBlocked = new Blocked(req.body);
+        const newBlocked = new Blocked({ users: [blockerId, blockeeId] });
         const user = await User.findOneAndUpdate(
             {
                 _id: blockerId,
