@@ -1,16 +1,22 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { userActions } from "../redux/actions/user.actions";
 import { useAuth } from "../hooks/useAuth";
 import Spinner from "./Spinner";
 
 function RequestStatement({ user, blocked }) {
+    const { id } = useParams();
     const dispatch = useDispatch();
     const loggedInUser = useAuth();
     const loading = useSelector((state) => state.users.loading);
 
     const handleSubmit = () => {
-        const obj = { blockeeId: user._id, blockerId: loggedInUser.id };
+        const obj = {
+            blockeeId: user._id,
+            blockerId: loggedInUser.id,
+            conversationId: id,
+        };
         dispatch(userActions.blockUser(obj));
     };
 
