@@ -167,16 +167,23 @@ exports.getUsersByPlate = async (req, res) => {
                 { users: { $in: [req.user.userId] } },
             ],
         });
-        cars.forEach((car, i) => {
-            if (
-                blocked.find((block) =>
-                    block.users.includes(car.userDetails._id.toString())
-                )
-            )
-                cars.splice(i, 1);
-        });
+        const blockedIds = [
+            ...new Set(
+                blocked
+                    .map((b) => b.users.join())
+                    .join()
+                    .split(",")
+            ),
+        ];
 
-        return res.status(200).json(cars);
+        return res
+            .status(200)
+            .json(
+                cars.filter(
+                    (car) =>
+                        !blockedIds.includes(car.userDetails._id.toString())
+                )
+            );
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }

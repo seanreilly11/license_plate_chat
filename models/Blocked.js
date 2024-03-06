@@ -12,6 +12,10 @@ const blockedSchema = new mongoose.Schema({
     //     ref: "User",
     //     required: true,
     // },
+    conversationId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Conversation",
+    },
     users: {
         type: [String],
         required: true,

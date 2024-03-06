@@ -1,6 +1,7 @@
 const Message = require("../models/Message");
 const Conversation = require("../models/Conversation");
 const User = require("../models/User");
+const Blocked = require("../models/Blocked");
 const utils = require("./utils");
 
 // @desc Get all messages. Access level 1 returns no filter - should be used for console. No access level returns active status only - app
@@ -39,6 +40,14 @@ exports.getMessageByID = async (req, res, next) => {
 // @route POST /api/v1/messages
 exports.addMessage = async (req, res, next) => {
     try {
+        const blocked = await Blocked.find({
+            conversationId: req.body.conversationId,
+        });
+        if (blocked.length > 0)
+            return res
+                .status(403)
+                .json({ error: "Can't send message. User blocked" });
+
         const message = await Message.create(req.body);
         const conversation = await Conversation.findOneAndUpdate(
             {
